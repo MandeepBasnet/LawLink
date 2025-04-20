@@ -1,0 +1,951 @@
+import validator from "validator";
+import bcrypt from "bcrypt";
+import { v2 as cloudinary } from "cloudinary";
+import lawyerModel from "../models/lawyerModel.js";
+import jwt from "jsonwebtoken";
+import appointmentModel from "../models/appointmentModel.js";
+import userModel from "../models/userModel.js";
+
+//API for adding lawyer
+const addlawyer = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      practice,
+      degree,
+      experience,
+      about,
+      fees,
+      address,
+    } = req.body;
+
+    console.log("Request body:", req.body);
+    console.log("Request file:", req.file);
+
+    // Checking for all data to add lawyer
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !practice ||
+      !degree ||
+      !experience ||
+      !about ||
+      !fees ||
+      !address
+    ) {
+      return res.json({ success: false, message: "All fields are required" });
+    }
+
+    // Validating email format
+    if (!validator.isEmail(email)) {
+      return res.json({
+        success: false,
+        message: "Please enter a valid email",
+      });
+    }
+
+    // Validating password format
+    if (password.length < 8) {
+      return res.json({
+        success: false,
+        message: "Please enter a strong password with minimum 8 characters",
+      });
+    }
+
+    // Check if email already exists
+    const existingLawyer = await lawyerModel.findOne({ email });
+    if (existingLawyer) {
+      return res.json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
+    // Hashing Lawyer password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Handle address parsing
+    let parsedAddress;
+    try {
+      parsedAddress =
+        typeof address === "object" ? address : JSON.parse(address);
+    } catch (error) {
+      console.error("Address parsing error:", error);
+      return res.json({
+        success: false,
+        message: "Invalid address format. Please provide a valid JSON object.",
+      });
+    }
+
+    // Handle image upload
+    let imageUrl = "";
+
+    // Check if image file exists
+    if (!req.file) {
+      return res.json({
+        success: false,
+        message: "Profile image is required",
+      });
+    }
+
+    try {
+      const imageUpload = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: "image",
+      });
+      imageUrl = imageUpload.secure_url;
+    } catch (cloudinaryError) {
+      console.error("Cloudinary upload error:", cloudinaryError);
+      return res.json({
+        success: false,
+        message: "Error uploading image. Please try again.",
+      });
+    }
+
+    // Adding lawyer to database
+    const lawyerData = {
+      name,
+      email,
+      password: hashedPassword,
+      image: imageUrl,
+      practice,
+      degree,
+      experience,
+      about,
+      fees: Number(fees),
+      address: parsedAddress,
+      date: Date.now(),
+    };
+
+    const newLawyer = new lawyerModel(lawyerData);
+    await newLawyer.save();
+
+    res.json({ success: true, message: "Lawyer added successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API for admin login
+const loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
+      const token = jwt.sign(email + password, process.env.JWT_SECRET_KEY);
+      res.json({
+        success: true,
+        message: "Admin logged in successfully",
+        token: token,
+      });
+    } else {
+      res.json({ success: false, message: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to get all lawyers list for admin panel
+const allLawyers = async (req, res) => {
+  try {
+    const lawyers = await lawyerModel.find({}).select("-password");
+    res.json({ success: true, lawyers });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to get all appointments list for admin
+const appointmentsAdmin = async (req, res) => {
+  try {
+    const appointments = await appointmentModel.find({});
+    res.json({ success: true, appointments });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API For appointment cancellation by Admin
+const appointmentCancel = async (req, res) => {
+  try {
+    
+    const {appointmentId} = req.body
+    const appointmentData = await appointmentModel.findById(appointmentId)
+
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {cancelled:true})
+
+    //releasing lawyers Slot
+    const {lawyerId, slotDate, slotTime} = appointmentData
+    
+    const lawyerData = await lawyerModel.findById(lawyerId)
+    
+    let slots_booked = lawyerData.slots_booked
+    
+    slots_booked[slotDate] = slots_booked[slotDate].filter((e) => e !== slotTime)
+    
+    await lawyerModel.findByIdAndUpdate(lawyerId, {slots_booked})
+
+    res.json({success: true, message: "Appointment cancelled successfully"})
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
+//API to get Dachboard data for admin panel
+const adminDashboard = async (req, res) => {
+  try {
+    const lawyers = await lawyerModel.find({})
+    const users = await userModel.find({})
+    const appointments = await appointmentModel.find({})
+
+    const dashData = {
+      lawyers: lawyers.length,
+      clients: users.length,
+      appointments: appointments.length,
+      latestAppointments: appointments.reverse().slice(0, 5)
+    }
+
+    res.json({ success: true, dashData })
+
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
+export { addlawyer, loginAdmin, allLawyers, appointmentsAdmin, appointmentCancel, adminDashboard };
+
+
+import lawyerModel from "../models/lawyerModel.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import appointmentModel from "../models/appointmentModel.js"
+
+const changeAvailability = async (req, res) => {
+  try {
+    const { lawId } = req.body
+
+    const lawData = await lawyerModel.findById(lawId)
+    await lawyerModel.findByIdAndUpdate(lawId, { available: !lawData.available })
+    res.json({ success: true, message: "Availability changed successfully" })
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+const lawyerList = async (req, res) => {
+  try {
+    const lawyers = await lawyerModel.find({}).select(["-password", "-email"])
+    res.json({ success: true, lawyers })
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+//API for lawyer login
+const loginLawyer = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const lawyer = await lawyerModel.findOne({ email })
+
+    if (!lawyer) {
+      return res.json({ success: false, message: "Lawyer not found" })
+    }
+    const isMatch = await bcrypt.compare(password, lawyer.password)
+
+    if (isMatch) {
+      const token = jwt.sign({ id: lawyer._id }, process.env.JWT_SECRET_KEY)
+
+      res.json({
+        success: true,
+        message: "Lawyer logged in successfully",
+        token: token,
+      })
+    } else {
+      res.json({ success: false, message: "Invalid password" })
+    }
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+//API to get lawyers appointments for lawyer panel
+const appointmentsLawyer = async (req, res) => {
+  try {
+    const { lawyerId } = req.body // Changed from lawId to lawyerId to match middleware
+    console.log("Lawyer ID for appointments:", lawyerId)
+
+    const appointments = await appointmentModel.find({ lawyerId }) // Changed from lawId to lawyerId
+    res.json({ success: true, appointments })
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+//API to mark appointment completed for lawyer panel
+const appointmentComplete = async (req, res) => {
+  try {
+    const { lawyerId, appointmentId } = req.body // Changed from lawId to lawyerId
+
+    const appointmentData = await appointmentModel.findById(appointmentId)
+
+    if (appointmentData && appointmentData.lawyerId === lawyerId) {
+      // Changed from lawId to lawyerId
+      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true })
+      return res.json({ success: true, message: "Appointment marked as completed" })
+    } else {
+      return res.json({ success: false, message: "Appointment mark failed" })
+    }
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+//API to cancel appointment completed for lawyer panel
+const appointmentCancel = async (req, res) => {
+  try {
+    const { lawyerId, appointmentId } = req.body // Changed from lawId to lawyerId
+
+    const appointmentData = await appointmentModel.findById(appointmentId)
+
+    if (appointmentData && appointmentData.lawyerId === lawyerId) {
+      // Changed from lawId to lawyerId
+      await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+      return res.json({ success: true, message: "Appointment Cancelled" })
+    } else {
+      return res.json({ success: false, message: "Appointment Cancellation failed" })
+    }
+  } catch (error) {
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+// API to get dashboard data for lawyer panel
+const lawyerDashboard = async (req, res) => {
+  try {
+    const lawyerId = req.body.lawyerId // Use the lawyerId added by the middleware
+    console.log("Lawyer ID for dashboard:", lawyerId)
+
+    const appointments = await appointmentModel.find({ lawyerId }) // Changed from lawId to lawyerId
+
+    let earnings = 0
+    appointments.forEach((item) => {
+      if (item.isCompleted) {
+        earnings += item.amount
+      }
+    })
+
+    const clients = [...new Set(appointments.map((item) => item.userId))]
+
+    const dashData = {
+      appointments: appointments.length,
+      clients: clients.length,
+      earnings,
+      latestAppointments: appointments.slice().reverse().slice(0, 5),
+    }
+
+    res.json({ success: true, dashData })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+// API to get Lawyer profile for lawyer panel
+const lawyerProfile = async (req, res) => {
+  try {
+    const lawyerId = req.body.lawyerId // Use the lawyerId added by the middleware
+    const profileData = await lawyerModel.findById(lawyerId).select("-password")
+    res.json({ success: true, profileData })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+
+//API to update Lawyer Profile from Lawyer Panel
+const updateLawyerProfile = async (req, res) => {
+  try {
+    const {lawyerId, fees, address, available} = req.body
+    await lawyerModel.findByIdAndUpdate(lawyerId, {fees, address, available})
+    res.json({success: true, message: "Lawyer Profile Updated Successfully"})
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: error.message })
+      }
+    }
+
+
+export {
+  changeAvailability,
+  lawyerList,
+  loginLawyer,
+  appointmentsLawyer,
+  appointmentComplete,
+  appointmentCancel,
+  lawyerDashboard,
+  lawyerProfile,
+  updateLawyerProfile
+}
+
+import validator from "validator";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import userModel from "../models/userModel.js";
+import {v2 as cloudinary} from "cloudinary"
+import lawyerModel from "../models/lawyerModel.js";
+import appointmentModel from "../models/appointmentModel.js";
+
+//API to register user
+const registerUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.json({ success: false, message: "All fields are required" });
+    }
+
+    //Validate Email Format
+    if (!validator.isEmail(email)) {
+      return res.json({
+        success: false,
+        message: "Please enter a valid email",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.json({
+        success: false,
+        message: "Please enter a strong password with minimum 8 characters",
+      });
+    }
+    //Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const userData = {
+      name,
+      email,
+      password: hashedPassword,
+    };
+
+    const newUser = new userModel(userData);
+    const user = await newUser.save();
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
+
+    res.json({ success: true, message: "User registered successfully", token });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API for user login
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY);
+      return res.json({
+        success: true,
+        message: "User logged in successfully",
+        token,
+      });
+    } else {
+      return res.json({ success: false, message: "Invalid password" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API to get user profile data
+const getProfile = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const userData = await userModel.findById(userId).select("-password");
+
+    res.json({ success: true, userData });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API to update user profile
+const updateProfile = async (req, res) => {
+  try {
+    const { userId, name, phone, address, dob, gender } = req.body;
+    const imageFile = req.file;
+
+    if (!name || !phone || !address || !dob || !gender) {
+      return res.json({ success: false, message: "All fields are required" });
+    }
+    await userModel.findByIdAndUpdate(userId, {
+      name,
+      phone,
+      address: JSON.parse(address),
+      dob,
+      gender,
+    });
+
+    if (imageFile) {
+      //Upload Image to Cloudinary
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {resource_type: "image"})
+      const imageURL = imageUpload.secure_url
+
+      await userModel.findByIdAndUpdate(userId, { image: imageURL });
+    }
+
+    res.json({ success: true, message: "Profile updated successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//API to book Appointment
+const bookAppointment = async (req, res) => {
+  try {
+
+    const { userId, lawyerId, slotDate, slotTime } = req.body;
+
+    const lawData = await lawyerModel.findById(lawyerId).select("-password");
+
+    if (!lawData.available) {
+      return res.json({ success: false, message: "Lawyer is currently unavailable" });
+    }
+
+    let slots_booked = lawData.slots_booked
+
+    // Checking for slots availability
+    if (slots_booked[slotDate]){
+      if (slots_booked[slotDate].includes(slotTime)){
+        return res.json({ success: false, message: "Slot is already booked" });
+      }else{
+        slots_booked[slotDate].push(slotTime)
+      }
+    } else {
+      slots_booked[slotDate] = []
+      slots_booked[slotDate].push(slotTime)
+    }
+
+    const userData = await userModel.findById(userId).select("-password");
+
+    delete lawData.slots_booked
+
+    const appointmentData = {
+      userId,
+      lawyerId,
+      userData,
+      lawData,
+      amount: lawData.fees,
+      slotDate,
+      slotTime,
+      date: new Date().getTime(),
+    };
+
+    const newAppointment = new appointmentModel(appointmentData);
+    await newAppointment.save();
+
+    // Save new slots data in lawyers data
+    await lawyerModel.findByIdAndUpdate(lawyerId, { slots_booked });
+
+    res.json({ success: true, message: "Appointment booked successfully" });
+    
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+    
+  }
+};
+
+//API to get user appointments for frontend my appointment pages
+const listAppointment = async (req, res) => {
+  try {
+    const {userId} = req.body
+    const appointments = await appointmentModel.find({userId})
+    res.json({success: true, appointments})
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
+//API to cancel appointment
+const cancelAppointment = async (req, res) => {
+  try {
+    
+    const {userId, appointmentId} = req.body
+    const appointmentData = await appointmentModel.findById(appointmentId)
+    // Verify Appointment user
+    if (appointmentData.userId !== userId){
+      return res.json({success: false, message: "You are not authorized to cancel this appointment"})
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {cancelled:true})
+
+    //releasing lawyers Slot
+    const {lawyerId, slotDate, slotTime} = appointmentData
+    
+    const lawyerData = await lawyerModel.findById(lawyerId)
+    
+    let slots_booked = lawyerData.slots_booked
+    
+    slots_booked[slotDate] = slots_booked[slotDate].filter((e) => e !== slotTime)
+    
+    await lawyerModel.findByIdAndUpdate(lawyerId, {slots_booked})
+
+    res.json({success: true, message: "Appointment cancelled successfully"})
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };
+
+
+import jwt from "jsonwebtoken"
+
+//admin authentication middleware
+const authAdmin = (req, res, next) => {
+  try {
+
+    const {atoken} = req.headers
+    if (!atoken) {
+      return res.json({ success: false, message: "Not Authorized Personnel, Please login Again" })
+    }
+    const token_decode = jwt.verify(atoken, process.env.JWT_SECRET_KEY)
+    if (token_decode !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD) {
+      return res.json({ success: false, message: "Not Authorized Personnel, Please login Again" })
+    }
+
+    next()
+  }
+  catch(error){
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+export default authAdmin
+
+import jwt from "jsonwebtoken"
+import lawyerModel from "../models/lawyerModel.js"
+
+//lawyer authentication middleware
+const authLawyer = async (req, res, next) => {
+  try {
+    // Log the headers to debug
+    console.log("Request headers:", req.headers)
+
+    // Check for token in both formats (for backward compatibility)
+    const token = req.headers.ltoken || req.headers.lToken
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Not Authorized Personnel, Please login Again",
+      })
+    }
+
+    const token_decode = jwt.verify(token, process.env.JWT_SECRET_KEY)
+
+    // Optional: Verify the lawyer still exists
+    const lawyer = await lawyerModel.findById(token_decode.id)
+    if (!lawyer) {
+      return res.status(401).json({
+        success: false,
+        message: "Lawyer not found. Please login again.",
+      })
+    }
+
+    req.body.lawyerId = token_decode.id
+
+    next()
+  } catch (error) {
+    console.log(error)
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token. Please login again.",
+      })
+    }
+    res.status(500).json({
+      success: false,
+      message: "Authentication error occurred",
+    })
+  }
+}
+
+export default authLawyer
+
+
+
+import jwt from "jsonwebtoken"
+
+//user authentication middleware
+const authUser = (req, res, next) => {
+  try {
+
+    const {token} = req.headers
+    if (!token) {
+      return res.json({ success: false, message: "Not Authorized Personnel, Please login Again" })
+    }
+    const token_decode = jwt.verify(token, process.env.JWT_SECRET_KEY)
+
+    req.body.userId = token_decode.id
+
+    next()
+  }
+  catch(error){
+    console.log(error)
+    res.json({ success: false, message: error.message })
+  }
+}
+
+export default authUser
+
+import multer from "multer"
+import path from "path"
+
+// Set storage engine
+const storage = multer.diskStorage({
+  destination: "./uploads/",
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname))
+  },
+})
+
+// Initialize upload
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5000000 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    checkFileType(file, cb)
+  },
+})
+
+// Check file type
+function checkFileType(file, cb) {
+  // Allowed extensions
+  const filetypes = /jpeg|jpg|png|gif/
+  // Check extension
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
+  // Check mime type
+  const mimetype = filetypes.test(file.mimetype)
+
+  if (mimetype && extname) {
+    return cb(null, true)
+  } else {
+    cb("Error: Images Only!")
+  }
+}
+
+export default upload
+
+import mongoose from "mongoose";
+
+const appointmentSchema = new mongoose.Schema({
+  userId: {type: String, required: true},
+  lawyerId: {type: String, required: true},
+  slotDate: {type: String, required: true},
+  slotTime: {type: String, required: true},
+  userData : {type: Object, required: true},
+  lawData : {type: Object, required: true},
+  amount: {type: Number, required: true},
+  date: {type: Number, required: true},
+  cancelled : {type: Boolean, default: false},
+  isCompleted : {type: Boolean, default: false}
+})
+
+const appointmentModel = mongoose.models.appointment || mongoose.model("appointment", appointmentSchema);
+export default appointmentModel
+
+import mongoose from "mongoose";
+
+const lawyerSchema = new mongoose.Schema({
+  name: {type: String, required: true},
+  email: {type: String, required: true, unique: true},
+  password: {type: String, required: true},
+  image: {type: String, required: true},
+  practice: {type: String, required: true},
+  degree: {type: String, required: true},
+  experience: {type: String, required: true},
+  about: {type: String, required: true},
+  available: {type: Boolean, default: true},
+  fees: {type: Number, required: true},
+  address: {type: Object, required: true},
+  date: {type: Number, required: true},
+  slots_booked: {type: Object, default: {}},
+},{minimize: false});
+
+const lawyerModel = mongoose.models.lawyer || mongoose.model("lawyer", lawyerSchema);
+
+export default lawyerModel;
+
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema({
+  name: {type: String, required: true},
+  email: {type: String, required: true, unique: true},
+  password: {type: String, required: true},
+  image: {type: String, default:'data:image/png;base64,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'},
+  address: {type: Object, default: {line1:'', line2:''}},
+  gender: {type: String, default: "Not Selected"},
+  dob: {type: String, default: "Not Selected"},
+  phone: {type: String, default: "0000000000"},
+});
+
+const userModel = mongoose.models.user || mongoose.model("user", userSchema);
+
+export default userModel;
+
+import express from "express"
+import { addlawyer,allLawyers,loginAdmin,appointmentsAdmin,appointmentCancel, adminDashboard } from "../controllers/adminController.js"
+import upload from "../middlewares/multer.js"
+import authAdmin from "../middlewares/authAdmin.js"
+import { changeAvailability } from "../controllers/lawyerController.js"
+
+const adminRouter = express.Router()
+
+// Make sure the field name matches what your client is sending
+adminRouter.post("/add-lawyer",authAdmin, upload.single("image"), addlawyer)
+adminRouter.post("/login",  loginAdmin)
+adminRouter.post("/all-lawyers",authAdmin,  allLawyers)
+adminRouter.post("/change-availability",authAdmin,  changeAvailability)
+adminRouter.get("/appointments",authAdmin,  appointmentsAdmin)
+adminRouter.post("/cancel-appointment",authAdmin, appointmentCancel  )
+adminRouter.get("/dashboard",authAdmin,  adminDashboard)
+
+
+export default adminRouter
+
+import express from "express"
+import {
+  lawyerList,
+  loginLawyer,
+  appointmentsLawyer,
+  appointmentComplete,
+  appointmentCancel,
+  lawyerDashboard,
+  lawyerProfile,
+  updateLawyerProfile
+} from "../controllers/lawyerController.js"
+import authLawyer from "../middlewares/authLawyer.js"
+
+const lawyerRouter = express.Router()
+
+// Add a debug middleware to log all requests
+lawyerRouter.use((req, res, next) => {
+  console.log(`Lawyer API Request: ${req.method} ${req.path}`)
+  console.log("Headers:", req.headers)
+  next()
+})
+
+lawyerRouter.get("/list", lawyerList)
+lawyerRouter.post("/login", loginLawyer)
+lawyerRouter.get("/appointments", authLawyer, appointmentsLawyer)
+lawyerRouter.post("/complete-appointment", authLawyer, appointmentComplete)
+lawyerRouter.post("/cancel-appointment", authLawyer, appointmentCancel)
+lawyerRouter.get("/dashboard", authLawyer, lawyerDashboard)
+lawyerRouter.get("/profile", authLawyer, lawyerProfile)
+lawyerRouter.post("/update-profile", authLawyer, updateLawyerProfile)
+
+export default lawyerRouter
+
+import express from 'express'
+import { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment } from '../controllers/userController.js'
+import authUser from '../middlewares/authUser.js'
+import upload from '../middlewares/multer.js'
+
+const userRouter = express.Router()
+
+userRouter.post('/register', registerUser)
+
+userRouter.post('/login', loginUser)
+
+userRouter.get('/get-profile',authUser, getProfile)
+
+userRouter.post('/update-profile',upload.single("image"), authUser, updateProfile)
+
+userRouter.post('/book-appointment',authUser, bookAppointment)
+
+userRouter.get('/my-appointments',authUser, listAppointment)
+
+userRouter.post('/cancel-appointment',authUser, cancelAppointment)
+
+export default userRouter
+
+MONGODB_URI = 'mongodb+srv://mandeep:mandeep123@cluster0.ewezm.mongodb.net'
+CLOUDINARY_NAME = 'domedbbxb'
+CLOUDINARY_API_KEY = '726586322714382'
+CLOUDINARY_SECRET_KEY = 'ZURlujZIDMt9r1p9qIzK-IGRyYc'
+ADMIN_EMAIL = 'admin@lawyerconnect.com'
+ADMIN_PASSWORD = 'admin123'
+JWT_SECRET_KEY = 'lawyerconnect'
+
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import connectDB from './config/mongodb.js'
+import connectCloudinary from './config/cloudinary.js'
+import adminRouter from './routes/adminRoute.js'
+import lawyerRouter from './routes/lawyerRoute.js'
+import userRouter from './routes/userRoute.js'
+
+// app config
+const app = express()
+const port = process.env.PORT || 4000
+connectDB()
+connectCloudinary()
+
+//middlewares
+app.use(express.json())
+app.use(cors())
+
+// api endpoints
+app.use('/api/admin', adminRouter)
+// localhost:4000/api/admin
+
+app.use('/api/lawyer', lawyerRouter)
+app.use('/api/user', userRouter)
+
+app.get('/',(req,res)=>{
+  res.send('API Working')
+})
+
+app.listen(port, ()=> console.log("Server Started", port))

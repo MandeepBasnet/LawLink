@@ -1,0 +1,373 @@
+LawLink Project: Detailed Guide (MVC Architecture)
+
+I. Introduction
+
+LawLink aims to connect clients with suitable lawyers efficiently through a web platform. This document outlines key components, features, and technologies using the MVC architecture, JSTL, Maven, and JSP pages with Jakarta Servlets.
+
+II. Overall Architecture
+
+LawLink will follow the Model-View-Controller (MVC) architecture to ensure separation of concerns, maintainability, and scalability.
+
+Model:
+
+Java classes representing data entities like Lawyer, Client, Appointment, etc.
+Data access objects (DAOs) to interact with the database.
+
+View:
+
+JSP (Jakarta Server Pages) for creating the user interface.
+JSTL (JSP Standard Tag Library) for dynamic content generation and presentation logic.
+CSS for styling.
+
+Controller:
+
+Jakarta Servlets to handle HTTP requests.
+Process user input, interact with the Model, and select the appropriate View to render.
+
+III. Technologies Used
+
+Backend:Java
+Jakarta Servlets
+JSP (Jakarta Server Pages)
+JSTL (JSP Standard Tag Library)
+Maven (for dependency management and build process)
+
+
+Database:(Specify your database choice, e.g., MySQL, PostgreSQL)
+
+
+Frontend:HTML
+CSS
+JavaScript (limited, only for essential UI enhancements)
+
+IV. Key Features and Components
+
+1. Home Page Design and Functionality
+
+Based on the provided image and project description:
+
+Header Section:Navigation Bar:Logo on the leftmost side.
+Navigation links: Home, Lawyers, My Appointments, About Us, and Contact Us.
+Register button on the rightmost side.
+
+
+Top Section:Left Side: Image.
+Right Side: Container with descriptions like "Innocent until Proven Guilty," "Organize your task through LawLink," and "We provide the best service."
+Book Appointment Now button (scrolls to the "Find Lawyers by Practice Area" section).
+Phone number display: +98027783.
+
+
+Search Section:Search bar to "Search by the name of attorney and practice areas."
+Dropdown: Practice Area.
+Search button.
+
+
+Practice Area Section:Six images representing different practice areas.The home page will be rendered using JSP pages with dynamic content managed by JSTL.
+
+2. Authentication and Authorization
+
+Secure Login: Implement secure login functionalities for Admins, Lawyers, and Clients using Servlets for processing login requests.
+Role-Based Access Control: Differentiate access based on user roles (Admin, Lawyer, Client). Servlets will handle authorization based on user roles.
+Session Management: Maintain authenticated states using session management provided by Jakarta Servlets.
+Password Management:Reset Password: Allow users to reset forgotten passwords.
+Change Password: Enable users to change their passwords.
+Email Verification: Use OTP (One-Time Password) for email verification during password changes. Servlets will handle password reset and change requests, integrating with email services for OTP delivery.
+
+3. Admin Dashboard
+
+The Admin Dashboard will be built using JSP pages, styled with CSS, and utilize Servlets for handling requests and managing data.
+
+Navbar:Displays the LawLink logo.
+Indicates user role (Admin or Lawyer).
+Provides a Logout button.
+
+
+Sidebar:Navigation links:Dashboard: Overview of system metrics.
+Appointments: Management of all appointments.
+Add Lawyers: Add new lawyer profiles.
+Lawyers List: List and manage existing lawyers.
+
+
+Functionality:Lawyer Management: Add, edit, and manage lawyer profiles and credentials.
+Client Management: View and manage client accounts.
+Appointment Oversight: Oversee and manage appointments.
+System Metrics: Display total appointments, active users, etc.
+
+4. User Portals
+
+Client Portal:Profile Management: Manage personal information using JSP forms and Servlets for processing.
+Lawyer Search: Search for lawyers by specialization and availability.
+Appointment Booking: Book and manage appointments with calendar integration.
+Payment Processing: Process payments for consultations.
+Consultation History: Review past consultations and leave reviews.
+
+
+Lawyer Portal:Profile Management: Manage profile with specialization details.
+Availability Calendar: Manage availability using a calendar.
+Appointment Tracking: Track and manage appointments.
+JSP pages will be used for rendering the UI, while Servlets handle the backend logic and data processing.
+
+5. Code Structure and MVC Implementation
+
+Model:
+
+Java classes representing entities (Lawyer, Client, Appointment, etc.).
+Data Access Objects (DAOs) to interact with the database.
+
+View:
+
+JSP pages for rendering the UI.
+JSTL for dynamic content generation and presentation.
+CSS for styling.
+
+Controller:
+
+Servlets for handling requests, processing data, and interacting with the Model.
+
+6. Maven Project Structure
+
+The project will be structured as a Maven project:
+
+src/main/java: Java source code for Servlets, DAOs, and Model classes.
+src/main/webapp: Web application resources (JSP pages, CSS, JavaScript, images).
+src/main/webapp/WEB-INF: Deployment descriptors (web.xml), tag library descriptors (TLDs).
+pom.xml: Maven project configuration file for managing dependencies.
+
+V. Implementation Steps
+
+Set Up Maven Project:
+
+Create a new Maven project.
+Configure pom.xml with dependencies for Jakarta Servlets, JSTL, database driver, and other required libraries.
+
+Database Setup:
+
+Create the database schema and tables.
+Configure database connection settings.
+
+Implement Model:
+
+Create Java classes for data entities.
+Implement DAOs for database interactions.
+
+Implement Controller:
+
+Create Servlets to handle HTTP requests.
+Process user input, interact with DAOs, and set attributes for JSP pages.
+
+Create Views:
+
+Develop JSP pages for rendering the UI.
+Use JSTL for dynamic content and formatting.
+Apply CSS for styling.
+
+Configure Deployment Descriptor:
+
+Configure web.xml to map Servlets to URL patterns.
+
+Testing and Deployment:
+
+Test all functionalities thoroughly.
+Deploy the application to a Jakarta EE-compatible server (e.g., Tomcat, GlassFish).
+
+LawLink Page Descriptions
+
+This document provides a detailed overview of each page within the LawLink project, based on the provided file contents.
+
+I. Admin Pages
+
+1. Login (Login.jsx)
+
+Purpose:Authentication page for admin and lawyer users.
+
+
+Functionality:Allows users to enter their email and password.
+Sends authentication request to the backend server.
+Upon successful authentication, stores the authentication token and redirects to the appropriate dashboard.
+
+
+Key Components:Form fields for email and password.
+Submit button to initiate login.
+Error message display for invalid credentials.
+
+
+Backend Interaction:Sends a POST request to the /api/admin/login endpoint.
+Handles the response, setting the authentication token in the AdminContext or LawyerContext.
+
+2. Dashboard (Dashboard.jsx)
+
+Purpose:Admin dashboard providing an overview of key system metrics and recent activity.
+
+
+Functionality:Displays summary cards for total lawyers, total clients, total appointments, and other relevant metrics.
+Shows a list of recent appointments or other system activity.
+Provides navigation to other admin functionalities.
+
+
+Key Components:Summary cards for displaying key metrics.
+List or table for displaying recent activity.
+Sidebar navigation for accessing other admin pages.
+
+
+Backend Interaction:Fetches data from the /api/admin/dashboard endpoint to populate the dashboard metrics.
+
+3. All Appointments (AllAppointments.jsx)
+
+Purpose:Displays a list of all appointments in the system.
+
+
+Functionality:Shows details for each appointment, including client, lawyer, date, time, and status.
+Allows admins to view, filter, and manage appointments.
+Provides options to cancel or reschedule appointments.
+
+
+Key Components:Table or list for displaying appointment data.
+Filtering and sorting options.
+Action buttons for managing appointments.
+
+
+Backend Interaction:Fetches appointment data from the /api/admin/appointments endpoint.
+Sends requests to update or cancel appointments via the API.
+
+4. Add Lawyer (AddLawyer.jsx)
+
+Purpose:Form for adding new lawyer profiles to the system.
+
+
+Functionality:Allows admins to enter lawyer details such as name, email, specialization, and contact information.
+Validates the input data to ensure it meets the required criteria.
+Submits the new lawyer data to the backend server.
+
+
+Key Components:Form fields for lawyer details.
+Validation logic for input data.
+Submit button to create the new lawyer profile.
+
+
+Backend Interaction:Sends a POST request to the /api/admin/lawyers endpoint to create a new lawyer.
+
+5. Lawyers List (LawyersList.jsx)
+
+Purpose:Displays a list of all lawyers in the system.
+
+
+Functionality:Shows lawyer details such as name, specialization, and contact information.
+Allows admins to edit, delete, or manage lawyer profiles.
+Provides search and filtering options to find specific lawyers.
+
+
+Key Components:Table or list for displaying lawyer data.
+Search and filtering options.
+Action buttons for managing lawyer profiles.
+
+
+Backend Interaction:Fetches lawyer data from the /api/admin/lawyers endpoint.
+Sends requests to update or delete lawyers via the API.
+
+II. Lawyer Pages
+
+1. Lawyer Dashboard (LawyerDashboard.jsx)
+
+Purpose:Lawyer dashboard providing an overview of key metrics and recent activity for the lawyer.
+
+
+Functionality:Displays summary cards for total earnings, upcoming appointments, and other relevant metrics.
+Shows a list of recent appointments or other activity related to the lawyer.
+Provides navigation to other lawyer functionalities.
+
+
+Key Components:Summary cards for displaying key metrics.
+List or table for displaying recent activity.
+Sidebar navigation for accessing other lawyer pages.
+
+
+Backend Interaction:Fetches data from the /api/lawyer/dashboard endpoint to populate the dashboard metrics.
+
+2. Lawyer Appointments (LawyerAppointments.jsx)
+
+Purpose:Displays a list of appointments for the logged-in lawyer.
+
+
+Functionality:Shows details for each appointment, including client, date, time, and status.
+Allows lawyers to view, filter, and manage their appointments.
+Provides options to complete or cancel appointments.
+
+
+Key Components:Table or list for displaying appointment data.
+Filtering and sorting options.
+Action buttons for managing appointments.
+
+
+Backend Interaction:Fetches appointment data from the /api/lawyer/appointments endpoint.
+Sends requests to update or cancel appointments via the API.
+
+3. Lawyer Profile (LawyerProfile.jsx)
+
+Purpose:Allows lawyers to manage and update their profile information.
+
+
+Functionality:Displays lawyer details such as name, specialization, contact information, and biography.
+Allows lawyers to edit their profile information.
+Provides options to update their availability calendar.
+
+
+Key Components:Form fields for lawyer details.
+Calendar component for managing availability.
+Submit button to update the profile.
+
+
+Backend Interaction:Fetches lawyer profile data from the /api/lawyer/profile endpoint.
+Sends requests to update profile information via the API.
+
+III. General Components and Contexts
+
+1. Navbar (Navbar.jsx)
+
+Purpose:Navigation bar component used across different pages.
+
+
+Functionality:Displays the LawLink logo.
+Provides navigation links to different sections of the application.
+Displays user role (Admin or Lawyer) and a logout button.
+
+
+Key Components:Logo.
+Navigation links.
+User role display.
+Logout button.
+
+2. Sidebar (Sidebar.jsx)
+
+Purpose:Sidebar component for navigation within the admin or lawyer dashboards.
+
+
+Functionality:Provides navigation links to different sections of the admin or lawyer functionalities.
+
+
+Key Components:Navigation links.
+
+3. Admin Context (AdminContext.jsx)
+
+Purpose:Manages admin-related states and functions.
+
+
+Functionality:Stores the admin authentication token (aToken).
+Provides functions for fetching and managing lawyers, appointments, and dashboard data.
+Includes functions for changing lawyer availability and canceling appointments.
+
+4. Lawyer Context (LawyerContext.jsx)
+
+Purpose:Manages lawyer-related states and functions.
+
+
+Functionality:Stores the lawyer authentication token (lToken).
+Provides functions for fetching and managing appointments, dashboard data, and profile information.
+Includes functions for completing and canceling appointments.
+
+5. App Context (AppContext.jsx)
+
+Purpose:Provides general utility functions and application-wide context.
+
+
+Functionality:Includes utility functions like date formatting and age calculation.
+Can be used to store global application settings or data.

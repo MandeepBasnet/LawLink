@@ -3,29 +3,28 @@ package model;
 import java.sql.Date;
 
 /**
- * Represents a client in the LawLink system.
- * Contains additional information specific to clients.
+ * Client class that extends User with client-specific attributes
  */
-public class Client {
+public class Client extends User {
     private int clientId;
-    private int userId;
     private Date dateOfBirth;
     private String gender;
-    private User user; // Associated user object
 
     // Default constructor
     public Client() {
+        super();
+        this.setRole("CLIENT");
     }
 
     // Constructor with essential fields
-    public Client(int userId) {
-        this.userId = userId;
+    public Client(String username, String password, String email, String fullName) {
+        super(username, password, email, fullName, "CLIENT");
     }
 
-    // Full constructor
-    public Client(int clientId, int userId, Date dateOfBirth, String gender) {
-        this.clientId = clientId;
-        this.userId = userId;
+    // Constructor with all fields
+    public Client(String username, String password, String email, String fullName,
+                  Date dateOfBirth, String gender) {
+        super(username, password, email, fullName, "CLIENT");
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
     }
@@ -37,14 +36,6 @@ public class Client {
 
     public void setClientId(int clientId) {
         this.clientId = clientId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public Date getDateOfBirth() {
@@ -63,19 +54,12 @@ public class Client {
         this.gender = gender;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     @Override
     public String toString() {
         return "Client{" +
                 "clientId=" + clientId +
-                ", userId=" + userId +
+                ", userId=" + getUserId() +
+                ", fullName='" + getFullName() + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", gender='" + gender + '\'' +
                 '}';

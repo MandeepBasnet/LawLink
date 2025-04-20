@@ -1,17 +1,15 @@
 package model;
 
-
 import java.sql.Timestamp;
-import util.FileStorageUtil;
 
 /**
- * Represents a user in the LawLink system.
- * This is the base class for all user types (Admin, Lawyer, Client).
+ * Base User class that represents common attributes for all user types
  */
 public class User {
     private int userId;
     private String username;
     private String password;
+    private String passwordSalt;
     private String email;
     private String fullName;
     private String phone;
@@ -20,7 +18,13 @@ public class User {
     private Timestamp registrationDate;
     private Timestamp lastLogin;
     private boolean isActive;
-    private String profileImage;  // Changed to store the file path instead of binary data
+    private String profileImage;
+    private String sessionToken;
+    private Timestamp sessionExpiry;
+    private String resetToken;
+    private Timestamp resetTokenExpiry;
+    private String otp;
+    private Timestamp otpExpiry;
 
     // Default constructor
     public User() {
@@ -34,24 +38,6 @@ public class User {
         this.fullName = fullName;
         this.role = role;
         this.isActive = true;
-    }
-
-    // Full constructor
-    public User(int userId, String username, String password, String email, String fullName,
-                String phone, String address, String role, Timestamp registrationDate,
-                Timestamp lastLogin, boolean isActive, String profileImage) {
-        this.userId = userId;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.address = address;
-        this.role = role;
-        this.registrationDate = registrationDate;
-        this.lastLogin = lastLogin;
-        this.isActive = isActive;
-        this.profileImage = profileImage;
     }
 
     // Getters and Setters
@@ -77,6 +63,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public void setPasswordSalt(String passwordSalt) {
+        this.passwordSalt = passwordSalt;
     }
 
     public String getEmail() {
@@ -143,57 +137,60 @@ public class User {
         isActive = active;
     }
 
-    /**
-     * Gets the profile image path.
-     *
-     * @return The profile image path, or null if not set
-     */
     public String getProfileImage() {
         return profileImage;
     }
 
-    /**
-     * Sets the profile image path.
-     *
-     * @param profileImage The profile image path
-     */
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
 
-    /**
-     * Checks if the user has a profile image.
-     *
-     * @return true if the user has a profile image, false otherwise
-     */
-    public boolean hasProfileImage() {
-        return profileImage != null && !profileImage.isEmpty();
+    public String getSessionToken() {
+        return sessionToken;
     }
 
-    /**
-     * Gets the profile image path or a default image if not set.
-     *
-     * @return The profile image path or default image path
-     */
-    public String getProfileImageOrDefault() {
-        if (hasProfileImage()) {
-            return profileImage;
-        } else {
-            return "assets/images/default-profile.png";
-        }
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
     }
 
-    /**
-     * Gets the CDN URL for the profile image.
-     *
-     * @return The CDN URL for the profile image, or the default image URL if not set
-     */
-    public String getProfileImageUrl() {
-        if (hasProfileImage()) {
-            return FileStorageUtil.getCdnUrl(profileImage);
-        } else {
-            return FileStorageUtil.getCdnUrl("assets/images/default-profile.png");
-        }
+    public Timestamp getSessionExpiry() {
+        return sessionExpiry;
+    }
+
+    public void setSessionExpiry(Timestamp sessionExpiry) {
+        this.sessionExpiry = sessionExpiry;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Timestamp getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(Timestamp resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public Timestamp getOtpExpiry() {
+        return otpExpiry;
+    }
+
+    public void setOtpExpiry(Timestamp otpExpiry) {
+        this.otpExpiry = otpExpiry;
     }
 
     @Override
@@ -204,9 +201,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", role='" + role + '\'' +
-                ", isActive=" + isActive +
-                ", hasProfileImage=" + hasProfileImage() +
                 '}';
     }
 }
-

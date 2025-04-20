@@ -1,0 +1,1293 @@
+import React, {useContext} from 'react'
+import {assets} from '../assets/assets'
+import { AdminContext } from '../context/AdminContext'
+import { useNavigate } from 'react-router-dom'
+import { LawyerContext } from '../context/LawyerContext'
+
+const Navbar = () => {
+
+  const {aToken, setAToken} = useContext(AdminContext)
+  const {lToken, setLToken} = useContext(LawyerContext)
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    navigate('/')
+    aToken && setAToken('')
+    aToken && localStorage.removeItem('aToken')
+    lToken && setLToken('')
+    lToken && localStorage.removeItem('lToken')
+  }
+  return (
+    <div className='flex justify-between items-center p-4 sm:px-10 border-b bg-white'>
+      <div className='flex items-center gap-4 text-xs'>
+        <img className='w-36 sm:w-40 cursor-pointer' src={assets.admin_logo} alt="" />
+        <p className='border px-2.5 py-0.5 rounded-full border-gray-500'>{aToken ? 'Admin' : 'Lawyer'}</p>
+      </div>
+      <button onClick={logout} className='bg-[#4682B4] text-white text-sm px-10 py-2 rounded-full'>Logout</button>
+    </div>
+  )
+}
+
+export default Navbar
+
+import React from 'react'
+import {useContext} from 'react'
+import { AdminContext } from '../context/AdminContext'
+import { NavLink } from 'react-router-dom'
+import { assets } from '../assets/assets'
+import { LawyerContext } from '../context/LawyerContext'
+
+const Sidebar = () => {
+
+  const {aToken} = useContext(AdminContext)
+  const {lToken} = useContext(LawyerContext)
+  return (
+    <div className='min-h-screen bg-white border-r'>
+      {
+        aToken && <ul className='text-[#515151] mt-5'>
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/admin-dashboard'}>
+            <img src={assets.home_icon} alt="" />
+            <p className='hidden md:block'>Dashboard</p>
+          </NavLink>
+
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/all-appointments'}>
+            <img src={assets.appointment_icon} alt="" />
+            <p className='hidden md:block'>Appointments</p>
+          </NavLink>
+
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/add-lawyer'}>
+            <img src={assets.add_icon} alt="" />
+            <p className='hidden md:block'>Add Lawyers</p>
+          </NavLink>
+
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/lawyer-list'}>
+            <img src={assets.people_icon} alt="" />
+            <p className='hidden md:block'>Lawyers List</p>
+          </NavLink>
+        </ul>
+      }
+
+      {/* For Lawyer */}
+
+      {
+        lToken && <ul className='text-[#515151] mt-5'>
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/lawyer-dashboard'}>
+            <img src={assets.home_icon} alt="" />
+            <p className='hidden md:block'>Dashboard</p>
+          </NavLink>
+
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/lawyer-appointments'}>
+            <img src={assets.appointment_icon} alt="" />
+            <p className='hidden md:block'>Appointments</p>
+          </NavLink>
+
+
+          <NavLink className={({isActive}) => `flex items-center gap-5 py-3.5 px-3 md:px-9 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-[#4682B4] ' :''}`} to={'/lawyer-profile'}>
+            <img src={assets.people_icon} alt="" />
+            <p className='hidden md:block'>Profile</p>
+          </NavLink>
+        </ul>
+      }
+    </div>
+  )
+}
+
+export default Sidebar
+
+/* eslint-disable no-unused-vars */
+import axios from "axios";
+import { createContext, useState } from "react";
+import { toast } from "react-toastify";
+
+export const AdminContext = createContext();
+
+
+
+const AdminContextProvider = (props) => {
+  const [aToken, setAToken] = useState(localStorage.getItem('aToken')? localStorage.getItem('aToken'):'');
+  const [lawyers, setLawyers] = useState([])
+  const [appointments, setAppointments] = useState([])
+  const [dashData, setDashData] = useState(false)
+
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const getAllLawyers = async () => {
+    try {
+      const {data} = await axios.post(backendUrl + '/api/admin/all-lawyers' , {}, {headers: {aToken}} )
+      if (data.success) {
+        setLawyers(data.lawyers)
+        console.log(data.lawyers)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const changeAvailability = async (lawId) => {
+    try {
+
+      const {data} = await axios.post(backendUrl + '/api/admin/change-availability' , {lawId}, {headers: {aToken}} )
+      if (data.success) {
+        toast.success(data.message)
+        getAllLawyers()
+      } else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      toast.error(error.message)
+      
+    }
+  }
+
+  const getAllAppointments = async () => {
+    try {
+
+      const {data} = await axios.get(backendUrl + '/api/admin/appointments' , {headers: {aToken}} )
+      if (data.success) {
+        setAppointments(data.appointments)
+        console.log(data.appointments)
+      } else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+
+      const {data} = await axios.post(backendUrl + '/api/admin/cancel-appointment' , {appointmentId}, {headers: {aToken}} )
+      if (data.success) {
+        toast.success(data.message)
+        getAllAppointments()
+      } else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      toast.error(error.message)
+      console.log(error)
+    }
+  }
+
+
+  const getDashData = async () => {
+    try {
+
+      const {data} = await axios.get(backendUrl + '/api/admin/dashboard' , {headers: {aToken}} )
+      if (data.success) {
+        setDashData(data.dashData)
+        console.log(data.dashData)
+        } else{
+          toast.error(data.message)
+        }
+      
+    } catch (error) {
+      toast.error(error.message)
+      console.log(error)
+    }
+  }
+
+
+
+  const value ={
+    aToken,setAToken, backendUrl, lawyers, getAllLawyers, changeAvailability, appointments,setAppointments, getAllAppointments, cancelAppointment, dashData, getDashData
+  }
+
+  return (
+    <AdminContext.Provider value={value}>
+      {props.children}
+    </AdminContext.Provider>
+  );
+
+};
+
+export default AdminContextProvider
+
+import { createContext } from "react";
+
+export const AppContext = createContext();
+
+// eslint-disable-next-line no-unused-vars
+const AppContextProvider = (props) => {
+
+  const currency = '$'
+
+  const calculateAge = (dob) =>{
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    return age
+  }
+
+  const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+  const slotDateFormat = (slotDate) => {
+    const dateArray = slotDate.split('_')
+    return dateArray[0] + ' ' + months[Number(dateArray[1])] + ' ' + dateArray[2]
+  }
+
+  const value ={
+    calculateAge,
+    slotDateFormat,
+    currency
+  }
+
+  return (
+    <AppContext.Provider value={value}>
+      {props.children}
+    </AppContext.Provider>
+  );
+
+};
+
+export default AppContextProvider
+
+
+"use client"
+
+import { useState } from "react"
+import { createContext } from "react"
+import axios from "axios"
+import { toast } from "react-toastify"
+
+export const LawyerContext = createContext()
+
+// eslint-disable-next-line no-unused-vars
+const LawyerContextProvider = (props) => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+
+  const [lToken, setLToken] = useState(localStorage.getItem("lToken") ? localStorage.getItem("lToken") : "")
+
+  const [appointments, setAppointments] = useState([])
+
+  const [dashData, setDashData] = useState(false)
+
+  const [profileData, setProfileData] = useState(false)
+
+  const getAppointments = async () => {
+    try {
+      // Log the token to debug
+      console.log("Using token for appointments:", lToken)
+
+      const { data } = await axios.get(backendUrl + "/api/lawyer/appointments", {
+        headers: {
+          ltoken: lToken, // Use lowercase 'ltoken' to match backend expectation
+        },
+      })
+
+      if (data.success) {
+        setAppointments(data.appointments)
+        console.log(data.appointments)
+      } else {
+        toast.error(data.message)
+        console.log(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
+  }
+
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/lawyer/complete-appointment",
+        { appointmentId },
+        {
+          headers: {
+            ltoken: lToken, // Use lowercase 'ltoken' to match backend expectation
+          },
+        },
+      )
+
+      if (data.success) {
+        toast.success(data.message)
+        getAppointments()
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
+  }
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/lawyer/cancel-appointment",
+        { appointmentId },
+        {
+          headers: {
+            ltoken: lToken, // Use lowercase 'ltoken' to match backend expectation
+          },
+        },
+      )
+
+      if (data.success) {
+        toast.success(data.message)
+        getAppointments()
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
+  }
+
+  const getDashData = async () => {
+    try {
+      // Log the token to debug
+      console.log("Using token for dashboard:", lToken)
+
+      const { data } = await axios.get(backendUrl + "/api/lawyer/dashboard", {
+        headers: {
+          ltoken: lToken, // Use lowercase 'ltoken' to match backend expectation
+        },
+      })
+
+      if (data.success) {
+        setDashData(data.dashData)
+        console.log(data.dashData)
+      } else {
+        toast.error(data.message)
+        // Potentially handle unauthorized access (e.g., clear token)
+        if (data.message.includes("Authorized")) {
+          setLToken("")
+          localStorage.removeItem("lToken")
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+      // Handle network errors or other issues
+    }
+  }
+
+  const getProfileData = async () => {
+    try {
+
+      const { data } = await axios.get(backendUrl + "/api/lawyer/profile", {
+        headers: {ltoken: lToken },
+      })
+
+      if (data.success) {
+        setProfileData(data.profileData)
+        console.log(data.profileData)
+      } else {
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+      // Handle network errors or other issues
+    }
+  }
+
+  const value = {
+    lToken,
+    setLToken,
+    backendUrl,
+    appointments,
+    setAppointments,
+    getAppointments,
+    completeAppointment,
+    cancelAppointment,
+    dashData,
+    setDashData,
+    getDashData,
+    profileData,
+    setProfileData,
+    getProfileData
+  }
+
+  return <LawyerContext.Provider value={value}>{props.children}</LawyerContext.Provider>
+}
+
+export default LawyerContextProvider
+
+import React, { useState, useContext } from "react";
+import { assets } from "../../assets/assets";
+import { AdminContext } from "../../context/AdminContext";
+import { toast } from "react-toastify";
+import axios from "axios";
+
+
+const AddLawyer = () => {
+  const [lawImg, setLawImg] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [experience, setExperience] = useState("1 Year");
+  const [fees, setFees] = useState("");
+  const [about, setAbout] = useState("");
+  const [practice, setPractice] = useState("Property Law");
+  const [degree, setDegree] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [address2, setAddress2] = useState("");
+
+  const {backendUrl, aToken} = useContext(AdminContext);
+
+  const onSubmitHandler = async (event) => {
+    event.preventDefault(); //dosent reload the web page
+
+    try {
+      if (!lawImg) {
+        return toast.error("Lawyer Image is required");
+    } 
+
+    const formData = new FormData();
+    formData.append("image", lawImg);
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("experience", experience);
+    formData.append("fees", Number(fees));
+    formData.append("about", about);
+    formData.append("practice", practice);
+    formData.append("degree", degree);
+    formData.append("address", JSON.stringify({line1:address1,line2:address2}));
+
+    // Console Log formData
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    })
+
+    const {data} = await axios.post(backendUrl + '/api/admin/add-lawyer', formData, {headers: {aToken}})
+
+    if (data.success) {
+      toast.success(data.message);
+      setLawImg(false);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setFees("");
+      setAbout("");
+      setDegree("");
+      setAddress1("");
+      setAddress2("");
+    } else {
+      toast.error(data.message);
+    }
+  }catch (error) {
+      toast.error(error.message)
+      console.log(error)
+    }
+  };
+
+  return (
+    <form onSubmit={onSubmitHandler} className="m-5 w-full">
+      <p className="mb-3 text-lg font-medium">Add Lawyer</p>
+      <div className="bg-white px-8 py-8 border rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
+        <div className="flex items-center gap-4 mb-8 text-gray-500">
+          <label htmlFor="law-img">
+            <img
+              className="w-16 bg-gray-100 rounded-full cursor-pointer"
+              src={lawImg ? URL.createObjectURL(lawImg) : assets.upload_area}
+              alt=""
+            />
+          </label>
+          <input
+            onChange={(e) => setLawImg(e.target.files[0])}
+            type="file"
+            id="law-img"
+            hidden
+          />
+          <p>
+            Upload Lawyer <br /> Image
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row items-start gap-10 text-gray-600">
+          <div className="w-full lg:flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Your Name</p>
+              <input
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+                className="border rounded px-3 py-2"
+                type="text"
+                placeholder="Name"
+                required
+              />
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Lawyer Email</p>
+              <input
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                className="border rounded px-3 py-2"
+                type="email"
+                placeholder="Email"
+                required
+              />
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Lawyer Password</p>
+              <input
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                className="border rounded px-3 py-2"
+                type="password"
+                placeholder="Password"
+                required
+              />
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Experience</p>
+              <select
+                onChange={(e) => setExperience(e.target.value)}
+                value={experience}
+                className="border rounded px-3 py-2"
+                name=""
+                id=""
+              >
+                <option value="1 Year">1 Year</option>
+                <option value="2 Year">2 Year</option>
+                <option value="3 Year">3 Year</option>
+                <option value="4 Year">4 Year</option>
+                <option value="5 Year">5 Year</option>
+                <option value="6 Year">6 Year</option>
+                <option value="7 Year">7 Year</option>
+                <option value="8 Year">8 Year</option>
+                <option value="9 Year">9 Year</option>
+                <option value="10 Year">10 Year</option>
+                <option value="11 Year">11 Year</option>
+                <option value="12 Year">12 Year</option>
+                <option value="13 Year">13 Year</option>
+                <option value="14 Year">14 Year</option>
+                <option value="15 Year">15 Year</option>
+                
+              </select>
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Fees</p>
+              <input
+                onChange={(e) => setFees(e.target.value)}
+                value={fees}
+                className="border rounded px-3 py-2"
+                type="number"
+                placeholder="Fees"
+                required
+              />
+            </div>
+          </div>
+          <div className="w-full lg:flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Practice</p>
+              <select
+                onChange={(e) => setPractice(e.target.value)}
+                value={practice}
+                className="border rounded px-3 py-2"
+                name=""
+                id=""
+              >
+                <option value="Property Law">Property Law</option>
+                <option value="Labour Law">Labour Law</option>
+                <option value="Criminal Law">Criminal Law</option>
+                <option value="International Law">International Law</option>
+                <option value="Contract Law">Contract Law</option>
+                <option value="Family Law">Family Law</option>
+              </select>
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Education</p>
+              <input
+                onChange={(e) => setDegree(e.target.value)}
+                value={degree}
+                className="border rounded px-3 py-2"
+                type="text"
+                placeholder="Education"
+                required
+              />
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Address</p>
+              <input
+                onChange={(e) => setAddress1(e.target.value)}
+                value={address1}
+                className="border rounded px-3 py-2"
+                type="text"
+                placeholder="Address 1"
+                required
+              />
+              <input
+                onChange={(e) => setAddress2(e.target.value)}
+                value={address2}
+                className="border rounded px-3 py-2"
+                type="text"
+                placeholder="Address 2"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="mt-4 mb-2">About Lawyer</p>
+          <textarea
+            onChange={(e) => setAbout(e.target.value)}
+            value={about}
+            className="w-full px-4 pt-2 border rounded"
+            placeholder="Write about doctor"
+            rows={6}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="bg-[#4682B4] text-white px-10 py-3 mt-4 rounded-full"
+        >
+          Add Lawyer
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default AddLawyer;
+
+
+/* eslint-disable react-hooks/exhaustive-deps */
+import React from 'react'
+import { useContext } from 'react'
+import { AdminContext } from '../../context/AdminContext'
+import { useEffect } from 'react'
+import { AppContext } from '../../context/AppContext'
+import { assets } from '../../assets/assets'
+
+const AllAppointments = () => {
+
+  const {aToken, appointments, getAllAppointments, cancelAppointment} = useContext(AdminContext)
+  const {calculateAge, slotDateFormat, currency} = useContext(AppContext)
+
+  useEffect(()=>{
+    if(aToken){
+      getAllAppointments()
+    }
+  },[aToken])
+
+  return (
+    <div className='w-full max-w-6xl m-5'>
+      
+      <p className='mb-3 text-lg font-medium'>All Appointments</p>
+      <div className='bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll]'>
+        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b '>
+          <p>#</p>
+          <p>Client</p>
+          <p>Age</p>
+          <p>Date & Time</p>
+          <p>Lawyer</p>
+          <p>Fees</p>
+          <p>Actions</p>
+        </div>
+
+        {appointments.map((item, index) => (
+          <div className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-100' key={index}>
+            <p className='max-sm:hidden'>{index+1}</p>
+            <div className='flex items-center gap-2'>
+              <img className='w-8 rounded-full' src={item.userData.image} alt="" /> <p>{item.userData.name}</p>
+            </div>
+            <p className='max-sm:hidden'>{calculateAge(item.userData.dob)}</p>
+            <p className='max-sm:hidden'>{slotDateFormat(item.slotDate)}, {slotDateFormat(item.slotTime)}</p>
+            <div className='flex items-center gap-2'>
+              <img className='w-8 rounded-full bg-gray-200' src={item.lawData.image} alt="" /> <p>{item.lawData.name}</p>
+            </div>
+            <p>{currency}{item.amount}</p>
+            {item.cancelled
+            ? <p className='text-red-500 text-xs font-medium'>Cancelled</p>
+            : item.isCompleted 
+                  ? <p className='text-green-500 text-xs font-medium'>Completed</p> 
+                  :<img onClick={()=>{cancelAppointment(item._id)}} className='w-10 cursor-pointer' src={assets.cancel_icon} alt="" />
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default AllAppointments
+
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useContext, useEffect } from "react"; 
+import { AdminContext } from "../../context/AdminContext"; 
+import { AppContext } from "../../context/AppContext"; 
+import { assets } from "../../assets/assets"; 
+ 
+const Dashboard = () => { 
+  const { aToken, dashData, getDashData, cancelAppointment } = 
+    useContext(AdminContext); 
+ 
+  const {slotDateFormat} = useContext(AppContext)  
+ 
+  useEffect(() => { 
+    if (aToken) { 
+      getDashData(); 
+    } 
+  }, [aToken]); 
+ 
+  // Use latestAppointments instead of appointments
+  const latestAppointments = Array.isArray(dashData?.latestAppointments) 
+    ? dashData.latestAppointments 
+    : [];
+ 
+  return ( 
+    dashData && ( 
+      <div className="m-5"> 
+        <div className="flex flex-wrap gap-3"> 
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all"> 
+            <img className="w-14" src={assets.lawyer_icon} alt="" /> 
+            <div> 
+              <p className="text-xl font-semibold text-gray-600"> 
+                {dashData.lawyers} 
+              </p> 
+              <p className="text-gray-400">Lawyers</p> 
+            </div> 
+          </div> 
+ 
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all"> 
+            <img className="w-14" src={assets.appointments_icon} alt="" /> 
+            <div> 
+              <p className="text-xl font-semibold text-gray-600"> 
+                {dashData.appointments} 
+              </p> 
+              <p className="text-gray-400">Appointments</p> 
+            </div> 
+          </div> 
+ 
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all"> 
+            <img className="w-14" src={assets.clients_icon} alt="" /> 
+            <div> 
+              <p className="text-xl font-semibold text-gray-600"> 
+                {dashData.clients} 
+              </p> 
+              <p className="text-gray-400">Clients</p> 
+            </div> 
+          </div> 
+        </div>
+        <div className="bg-white"> 
+          <div className="flex items-center gap-2.5 px-4 py-4 mt-10 rounded-t border"> 
+            <img src={assets.list_icon} alt="" /> 
+            <p className="font-semibold">Latest Bookings</p> 
+          </div> 
+ 
+          <div className="pt-4 border border-t-0"> 
+            {latestAppointments.map((item, index) => ( 
+              <div className="flex items-center px-6 py-3 gap-3 hover:bg-gray-100" key={index}> 
+                <img className="rounded-full w-10" src={item.lawData.image} alt="" /> 
+                <div className="flex-1 text-sm"> 
+                  <p className="text-gray-800 font-medium">{item.lawData.name}</p> 
+                  <p className="text-gray-600">{slotDateFormat(item.slotDate)}</p> 
+                </div> 
+                 {item.cancelled
+                            ? <p className='text-red-500 text-xs font-medium'>Cancelled</p>
+                            : item.isCompleted 
+                                  ? <p className='text-green-500 text-xs font-medium'>Completed</p> 
+                                  :<img onClick={()=>{cancelAppointment(item._id)}} className='w-10 cursor-pointer' src={assets.cancel_icon} alt="" />
+                  }
+              </div> 
+            ))} 
+          </div> 
+        </div> 
+      </div> 
+    ) 
+  ); 
+}; 
+ 
+export default Dashboard;
+
+import React, { useContext, useEffect } from 'react'
+import { AdminContext } from '../../context/AdminContext'
+
+const LawyersList = () => {
+
+  const { lawyers, aToken, getAllLawyers, changeAvailability } = useContext(AdminContext)
+
+  useEffect(() => {
+    if (aToken) {
+      getAllLawyers()
+    }
+  }, [aToken, getAllLawyers])
+
+  return (
+    <div className='m-5 max-h-[90vh] overflow-y-scroll '>
+      <h1 className='text-lg font-medium'>All Lawyers</h1>
+      <div className='w-full flex flex-wrap gap-4 pt-5 gap-y-6'>
+        {
+          lawyers && lawyers.length > 0 ? (
+            lawyers.map((item, index) => (
+              <div className='border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group' key={index}>
+                <img className='bg-indigo-50 group-hover:bg-[#4682B4] transition-all duration-500' src={item.image} alt="" />
+                <div className='p-4'>
+                  <p className='text-neutral-800 text-lg font-medium'>{item.name}</p>
+                  <p className='text-zinc-600 text-sm'>{item.practice}</p>
+                  <div className='mt-2 flex items-center gap-1 text-sm'>
+                    <input onChange={() => changeAvailability(item._id)} type="checkbox" checked={item.available} />
+                    <p>Available</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No lawyers available</p>
+          )
+        }
+      </div>
+    </div>
+  )
+}
+
+export default LawyersList
+
+
+import React from 'react'
+import { useContext } from 'react'
+import { useEffect } from 'react'
+import { LawyerContext } from '../../context/LawyerContext'
+import { AppContext } from '../../context/AppContext'
+import { assets } from '../../assets/assets'
+
+const LawyerAppointments = () => {
+
+  const {lToken, appointments, getAppointments, completeAppointment, cancelAppointment} = useContext(LawyerContext)
+  const {calculateAge, slotDateFormat, currency} = useContext(AppContext)
+
+  useEffect(() => {
+    if (lToken) {
+      getAppointments()
+    }
+    }, [lToken])
+  return (
+    <div className='w-full max-w-6xl m-5'>
+      <p className='mb-3 text-lg font-medium'>All Appointments</p>
+      <div className='bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll]'>
+        <div className='max-sm:hidden grid grid-cols-[0.5fr_3fr_1fr_3fr_1fr_1fr] gap-1 py-3 px-6 border-b '>
+          <p>#</p>
+          <p>Client</p>
+          <p>Age</p>
+          <p>Date & Time</p>
+          <p>Fees</p>
+          <p>Action</p>
+        </div>
+
+        {
+          appointments.reverse().map((item, index) => (
+            <div className='flex flex-wrap justify-between max-sm:gap-5 max-sm:text-base sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_1fr_1fr] gap-1 items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50' key={index}>
+              <p className='max-sm:hidden'>{index + 1}</p>
+              <div className='flex items-center gap-2'>
+                <img className='w-8 rounded-full' src={item.userData.image} alt="" /> <p>{item.userData.name}</p>
+              </div>
+              <p className='max-sm:hidden'>{calculateAge(item.userData.dob)}</p>
+              <p >{slotDateFormat(item.slotDate)}, {item.slotTime}</p>
+              <p>{currency}{item.amount}</p>
+              {
+                item.cancelled
+                  ? <p className='text-red-400 text-xs font-medium'>Cancelled</p>
+                  : item.isCompleted 
+                      ? <p className='text-green-500 text-xs font-medium'>Completed</p>
+                      : <div className='flex'>
+                          <img onClick={()=>{cancelAppointment(item._id)}} className='w-10 cursor-pointer' src={assets.cancel_icon} alt="" />
+                          <img onClick={()=>{completeAppointment(item._id)}} className='w-10 cursor-pointer' src={assets.tick_icon} alt="" />
+                        </div>
+
+              }
+            </div>
+
+          ))
+        }
+      </div>
+    </div>
+  )
+}
+
+export default LawyerAppointments
+
+/* eslint-disable no-unused-vars */
+import React, { useContext, useEffect } from "react";
+import { LawyerContext } from "../../context/LawyerContext";
+import { assets } from "../../assets/assets";
+import { AppContext } from "../../context/AppContext";
+
+const LawyerDashboard = () => {
+  const { lToken, dashData, setDashData, getDashData, cancelAppointment, completeAppointment } =
+    useContext(LawyerContext);
+
+  const { currency, slotDateFormat } =
+    useContext(AppContext);
+
+  useEffect(() => {
+    if (lToken) {
+      getDashData();
+    }
+  }, [lToken]);
+
+  // Use latestAppointments instead of appointments
+  const latestAppointments = Array.isArray(dashData?.latestAppointments)
+    ? dashData.latestAppointments
+    : [];
+
+  return (
+    dashData && (
+      <div className="m-5">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all">
+            <img className="w-14" src={assets.earning_icon} alt="" />
+            <div>
+              <p className="text-xl font-semibold text-gray-600">
+                {currency} {dashData.earnings}
+              </p>
+              <p className="text-gray-400">Earnings</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all">
+            <img className="w-14" src={assets.appointments_icon} alt="" />
+            <div>
+              <p className="text-xl font-semibold text-gray-600">
+                {dashData.appointments}
+              </p>
+              <p className="text-gray-400">Appointments</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-4 min-w-52 rounded border-2 border-gray-100 cursor-pointer hover:scale-105 transition-all">
+            <img className="w-14" src={assets.clients_icon} alt="" />
+            <div>
+              <p className="text-xl font-semibold text-gray-600">
+                {dashData.clients}
+              </p>
+              <p className="text-gray-400">Clients</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white">
+          <div className="flex items-center gap-2.5 px-4 py-4 mt-10 rounded-t border">
+            <img src={assets.list_icon} alt="" />
+            <p className="font-semibold">Latest Bookings</p>
+          </div>
+
+          <div className="pt-4 border border-t-0">
+            {latestAppointments.map((item, index) => (
+              <div
+                className="flex items-center px-6 py-3 gap-3 hover:bg-gray-100"
+                key={index}
+              >
+                <img
+                  className="rounded-full w-10"
+                  src={item.userData.image}
+                  alt=""
+                />
+                <div className="flex-1 text-sm">
+                  <p className="text-gray-800 font-medium">
+                    {item.userData.name}
+                  </p>
+                  <p className="text-gray-600">
+                    {slotDateFormat(item.slotDate)}
+                  </p>
+                </div>
+                {item.cancelled ? (
+                  <p className="text-red-400 text-xs font-medium">Cancelled</p>
+                ) : item.isCompleted ? (
+                  <p className="text-green-500 text-xs font-medium">
+                    Completed
+                  </p>
+                ) : (
+                  <div className="flex">
+                    <img
+                      onClick={() => {
+                        cancelAppointment(item._id);
+                      }}
+                      className="w-10 cursor-pointer"
+                      src={assets.cancel_icon}
+                      alt=""
+                    />
+                    <img
+                      onClick={() => {
+                        completeAppointment(item._id);
+                      }}
+                      className="w-10 cursor-pointer"
+                      src={assets.tick_icon}
+                      alt=""
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  );
+};
+
+export default LawyerDashboard;
+
+
+import React from 'react'
+import { useContext } from 'react'
+import { useEffect, useState } from 'react'
+import { LawyerContext } from '../../context/LawyerContext'
+import { AppContext } from '../../context/AppContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+
+const LawyerProfile = () => {
+
+  const {lToken, profileData, setProfileData, getProfileData , backendUrl} = useContext(LawyerContext)
+  const {currency} = useContext(AppContext)
+
+  const[isEdit, setIsEdit] = useState(false)
+
+  const updateProfile = async () => {
+    try {
+
+      const updateData = {
+        address: profileData.address,
+        fees: profileData.fees,
+        available: profileData.available
+      }
+
+      const { data } = await axios.post(backendUrl + "/api/lawyer/update-profile", updateData, {
+        headers: {
+          ltoken: lToken, // Use lowercase 'ltoken' to match backend expectation
+        },
+      })
+
+      if (data.success) {
+        toast.success(data.message)
+        setIsEdit(false)
+        getProfileData()
+      } else {
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      toast.error(error.message)
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (lToken) {
+      getProfileData()
+    }
+  }, [lToken])
+  
+  
+  return profileData &&  (
+    <div>
+      <div className='flex flex-col gap-4 m-5'>
+        <div>
+          <img className='bg-[#4682B4] w-full sm:max-w-64 rounded-lg' src={profileData.image} alt="" />
+        </div>
+
+        <div className='flex-1 border-stone-100 rounded-lg p-8 py-7 bg-white '>
+          {/*-----Lawyer Info-----*/}
+          <p className='flex items-center gap-2 text-3xl font-medium text-gray-700'>{profileData.name}</p>
+          <div className='flex items-center gap-2 mt-1 text-gray-600'>
+            <p>{profileData.degree} - {profileData.practice}</p>
+            <button className='py-0.5 px-3 border text-xs rounded-full'>{profileData.experience}</button>
+          </div>
+
+          <div>
+            {/*-----Lawyer About-----*/}
+            <p className='flex items-center gap-1 text-sm font-medium text-neutral-800 mt-3'>About:</p>
+            <p className='text-sm text-gray-600 max-w-[700px] mt-1 '>{profileData.about}</p>
+          </div>
+
+          <p className='text-gray-600 font-medium mt-4'>
+            Appointment Fee: <span className='text-gray-800'>{currency}{isEdit ? <input className='text-sm' type="number" onChange={(e) => setProfileData(prev => ({...prev, fees: e.target.value}))} value={profileData.fees}/> : profileData.fees}</span>
+          </p>
+
+          <div className=' flex gap-2 py-2'>
+            <p>Address:</p>
+            <p className='text-sm' >{
+              isEdit ? <input className='text-sm' type="text" onChange={(e) => setProfileData(prev => ({...prev, address: {...prev.address, line1: e.target.value}}))} value={profileData.address.line1}/> : profileData.address.line1}
+              <br />
+              {isEdit ? <input className='text-sm' type="text" onChange={(e) => setProfileData(prev => ({...prev, address: {...prev.address, line2: e.target.value}}))} value={profileData.address.line2}/> : profileData.address.line2}
+            </p>
+          </div>
+
+          <div className='flex gap-1 pt-2'>
+            <input onChange={()=> isEdit && setProfileData(prev => ({...prev, available: !prev.available}))} checked={profileData.available} type="checkbox" />
+            <label htmlFor="">Available</label>
+          </div>
+
+          {
+            isEdit 
+            ? <button onClick={updateProfile} className='px-4 pu-1 border border-[#4682B4] text-sm rounded-full mt-5 hover:bg-[#4682B4] hover:text-white transition-all'> Save </button>
+            : <button onClick={()=>{setIsEdit(true)}} className='px-4 pu-1 border border-[#4682B4] text-sm rounded-full mt-5 hover:bg-[#4682B4] hover:text-white transition-all'> Edit </button>
+          }
+
+          
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default LawyerProfile
+
+
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+import {React, useContext, useState} from 'react'
+import { assets } from '../assets/assets'
+import { AdminContext } from '../context/AdminContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { LawyerContext } from '../context/LawyerContext'
+
+const Login = () => {
+
+  const [state, setState] = useState('Admin')
+  const [email,setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const {setAToken, backendUrl} = useContext(AdminContext)
+  const {setLToken} = useContext(LawyerContext)
+
+  const onSubmitHandler = async (event) => {
+    event.preventDefault()
+    try {
+      // API Call
+      if (state === 'Admin') {
+
+        const {data} = await axios.post(backendUrl + '/api/admin/login', {email, password})
+        if (data.success) {
+          localStorage.setItem('aToken', data.token)
+          setAToken(data.token)
+        } else{
+          toast.error(data.message)
+        }
+
+      } else {
+        const {data} = await axios.post(backendUrl + '/api/lawyer/login', {email, password})
+        if (data.success) {
+          localStorage.setItem('lToken', data.token)
+          setLToken(data.token)
+          console.log(data.token)
+        } else{
+          toast.error(data.message)
+        }
+      }
+    } catch (error) { /* empty */ }
+  }
+
+
+
+  return (
+    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
+      <div className='flex flex-col gap-4 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
+        <p className='text-2xl font-semibold m-auto'><span className='text-[#4682B4]'>{state}</span> Login</p>
+        <div className='w-full'>
+          <p>Email</p>
+          <input onChange={(e) => {setEmail(e.target.value)}} value={email} className='border border-zinc-300 rounded w-full p-2 mt-1' type="email" required />
+        </div>
+        <div className='w-full'>
+          <p>Password</p>
+          <input onChange={(e) => {setPassword(e.target.value)}} value={password} className='border border-zinc-300 rounded w-full p-2 mt-1' type="password" required />
+        </div>
+        <button  className='bg-[#4682B4] text-white w-full py-2 rounded-md text-base'>Login</button>
+      {
+        state === 'Admin' 
+        ? <p>Lawyer Login? <span className='text-[#4682B4] cursor-pointer' onClick={()=> setState('Lawyer')}>Click Here</span></p>
+        : <p>Admin Login? <span className='text-[#4682B4] cursor-pointer' onClick={()=> setState('Admin')}>Click Here</span></p>
+      }
+      </div> 
+    </form>
+  )
+}
+
+export default Login
+
+
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+import React , {useContext} from 'react'
+import Login from './pages/Login.jsx'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AdminContext } from './context/AdminContext.jsx';
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar.jsx';
+import { Route, Routes } from 'react-router-dom';
+import Dashboard from './pages/Admin/Dashboard.jsx';
+import AllAppointments from './pages/Admin/AllAppointments.jsx';
+import AddLawyer from './pages/Admin/AddLawyer.jsx';
+import LawyersList from './pages/Admin/LawyersList.jsx';
+import { LawyerContext } from './context/LawyerContext.jsx';
+import LawyerDashboard from './pages/Lawyer/LawyerDashboard.jsx';
+import LawyerAppointments from './pages/Lawyer/LawyerAppointments.jsx';
+import LawyerProfile from './pages/Lawyer/LawyerProfile.jsx';
+
+const App = () => {
+
+  const {aToken} = useContext(AdminContext)
+  const {lToken} = useContext(LawyerContext)
+  return aToken || lToken ?  (
+    <div className='bg-[#F8F9FD]'>
+      <ToastContainer />
+      <Navbar />
+      <div className=' flex items-start'>
+        <Sidebar />
+        <Routes>
+          {/* Admin Route */}
+          <Route path="/" element={<></>} />
+          <Route path="/admin-dashboard" element={<Dashboard/>} />
+          <Route path="/all-appointments" element={<AllAppointments/>} />
+          <Route path="/add-lawyer" element={<AddLawyer/>} />
+          <Route path="/lawyer-list" element={<LawyersList/>} />
+
+          {/* Lawyer Route */}
+          <Route path="/lawyer-dashboard" element={<LawyerDashboard/>} />
+          <Route path="/lawyer-appointments" element={<LawyerAppointments/>} />
+          <Route path="/lawyer-profile" element={<LawyerProfile/>} />
+        </Routes>
+      </div>
+    </div>
+  ) : (
+    <>
+    <Login/>
+    <ToastContainer />
+    </>
+  )
+}
+
+export default App
+
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+import AdminContextProvider from "./context/AdminContext.jsx";
+import LawyerContextProvider from "./context/LawyerContext.jsx";
+import AppContextProvider from "./context/AppContext.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <AdminContextProvider>
+      <LawyerContextProvider>
+        <AppContextProvider>
+          <App />
+        </AppContextProvider>
+      </LawyerContextProvider>
+    </AdminContextProvider>
+  </BrowserRouter>
+);
