@@ -11,27 +11,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>--%>
       rel="stylesheet"
       href="${pageContext.request.contextPath}/assets/css/style.css"
     />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-      }
-
-      body {
-        background-color: #ffffff;
-      }
-
-      .container {
-        max-width: 900px;
-        margin: 20px auto;
-        background-color: rgba(42, 58, 71, 0.3);
-        border-radius: 10px;
-        padding: 20px;
-      }
-
-    </style>
   </head>
 
   <body>

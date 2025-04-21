@@ -2,6 +2,7 @@ package controller;
 
 import dao.UserDAO;
 import model.User;
+import util.ValidationUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +17,7 @@ import java.sql.SQLException;
 /**
  * Servlet to handle user login
  */
-@WebServlet("/login")
+@WebServlet("/log-in")
 public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -33,30 +34,42 @@ public class LoginServlet extends HttpServlet {
             User user = (User) session.getAttribute("user");
 
             if (user.getRole().equals("ADMIN")) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/admin-dashboard");
             } else if (user.getRole().equals("LAWYER")) {
-                response.sendRedirect(request.getContextPath() + "/lawyer/dashboard");
+                response.sendRedirect(request.getContextPath() + "/lawyer/lawyer-dashboard");
             } else if (user.getRole().equals("CLIENT")) {
-                response.sendRedirect(request.getContextPath() + "/client/dashboard");
+                response.sendRedirect(request.getContextPath() + "/client/my-appointments");
             }
 
             return;
         }
 
         // User is not logged in, forward to the login page
-        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
+        String email = ValidationUtil.sanitizeInput(request.getParameter("email"));
         String password = request.getParameter("password");
         boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
+        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            request.setAttribute("error", "Email and password are required");
+            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+            return;
+        }
+
+        if (!ValidationUtil.isValidEmail(email)) {
+            request.setAttribute("error", "Invalid email format");
+            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+            return;
+        }
+
         try {
             UserDAO userDAO = new UserDAO();
-            User user = userDAO.authenticate(username, password);
+            User user = userDAO.authenticateByEmail(email, password);
 
             if (user != null) {
                 // Create session
@@ -69,21 +82,24 @@ public class LoginServlet extends HttpServlet {
                 }
 
                 // Redirect based on role
-                if ("admin".equals(user.getRole())) {
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-                } else if ("lawyer".equals(user.getRole())) {
-                    response.sendRedirect(request.getContextPath() + "/lawyer/dashboard");
+                if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/admin/admin-dashboard");
+                } else if ("LAWYER".equalsIgnoreCase(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/lawyer/lawyer-dashboard");
+                } else if ("CLIENT".equalsIgnoreCase(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/client/my-appointments");
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/client/dashboard");
+                    // If role is not recognized, redirect to home
+                    response.sendRedirect(request.getContextPath() + "/home");
                 }
             } else {
-                request.setAttribute("error", "Invalid username or password");
-                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+                request.setAttribute("error", "Invalid email or password");
+                request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "An error occurred. Please try again later.");
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
         }
     }
 }

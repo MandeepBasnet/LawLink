@@ -8,50 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment - LawLink</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            nav ul {
-                gap: 15px;
-            }
-
-            .appointment-container {
-                flex-direction: column;
-            }
-
-            .lawyer-profile {
-                align-items: center;
-            }
-
-            .footer-content {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 </head>
 <body>
 <!-- Header -->

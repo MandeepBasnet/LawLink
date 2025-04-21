@@ -8,54 +8,6 @@
     <title>Our Lawyers - LawLink</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .appointment-lawyers-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 15px;
-            }
-
-            nav ul {
-                margin-top: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            nav ul li {
-                margin: 5px 10px;
-            }
-
-            .appointment-lawyers-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
 <!-- Header Section -->
@@ -64,12 +16,12 @@
 <!-- Lawyers Grid -->
 <div class="appointment-lawyers-container">
     <%-- Dynamic lawyers from database --%>
-    <c:forEach var="lawyer" items="${lawyers}">
+    <!-- <c:forEach var="lawyer" items="${lawyers}">
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/${lawyer.imageFile}"
+                <img src="${pageContext.request.contextPath}/assets/images/${lawyer.name}.jpg"
                      alt="${lawyer.name}"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">${lawyer.name}</h2>
@@ -81,16 +33,16 @@
                 </a>
             </div>
         </div>
-    </c:forEach>
+    </c:forEach> -->
 
     <%-- Fallback if no lawyers are loaded from the database --%>
     <c:if test="${empty lawyers}">
         <!-- Lawyer 1 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/zaina.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/zaina.jpg"
                      alt="Zaina Raj"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Zaina Raj</h2>
@@ -104,9 +56,9 @@
         <!-- Lawyer 2 -->
         <div class="lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/rayan.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/rayan.jpg"
                      alt="Rayan Rajbangsi"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Rayan Rajbangsi</h2>
@@ -120,9 +72,9 @@
         <!-- Lawyer 3 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/manish.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/manish.jpg"
                      alt="MANISH KHANAL"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">MANISH KHANAL</h2>
@@ -136,9 +88,9 @@
         <!-- Lawyer 4 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/baviyan.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/baviyan.jpg"
                      alt="Baviyan Koirala"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Baviyan Koirala</h2>
@@ -152,9 +104,9 @@
         <!-- Lawyer 5 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/lalita.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/lalita.jpg"
                      alt="Lalita Puri"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Lalita Puri</h2>
@@ -168,9 +120,9 @@
         <!-- Lawyer 6 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/ashutosh.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/ashutosh.jpg"
                      alt="Ashutosh Srivastava"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Ashutosh Srivastava</h2>
@@ -184,9 +136,9 @@
         <!-- Lawyer 7 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/yusha.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/yusha.jpg"
                      alt="Yusha Shrestha"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Yusha Shrestha</h2>
@@ -200,9 +152,9 @@
         <!-- Lawyer 8 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/anish.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/anish.jpg"
                      alt="Anish Basnet"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">Anish Basnet</h2>
@@ -216,9 +168,9 @@
         <!-- Lawyer 9 -->
         <div class="appointment-lawyer-card">
             <div class="appointment-lawyer-image">
-                <img src="${pageContext.request.contextPath}/images/lawyers/susasa.jpg"
+                <img src="${pageContext.request.contextPath}/assets/images/susasa.jpg"
                      alt="SUSASA ACHARYA"
-                     onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg?height=150&width=120'">
+                     onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="appointment-lawyer-info">
                 <h2 class="appointment-lawyer-name">SUSASA ACHARYA</h2>

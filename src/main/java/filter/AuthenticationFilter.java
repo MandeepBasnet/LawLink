@@ -56,7 +56,7 @@ public class AuthenticationFilter implements Filter {
             
             httpRequest.getSession().setAttribute("originalURL", originalURL);
             httpRequest.setAttribute("errorMessage", "Please log in to access this page");
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/log-in");
         }
     }
     

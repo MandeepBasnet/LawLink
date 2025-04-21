@@ -9,7 +9,6 @@ public class User {
     private int userId;
     private String username;
     private String password;
-    private String passwordSalt;
     private String email;
     private String fullName;
     private String phone;
@@ -64,14 +63,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPasswordSalt() {
-        return passwordSalt;
-    }
-
-    public void setPasswordSalt(String passwordSalt) {
-        this.passwordSalt = passwordSalt;
     }
 
     public String getEmail() {

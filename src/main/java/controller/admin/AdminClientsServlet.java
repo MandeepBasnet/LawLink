@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
-@WebServlet("/admin-clients")
+@WebServlet("/admin/admin-clients")
 public class AdminClientsServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(AdminClientsServlet.class.getName());
     private UserDAO userDAO;

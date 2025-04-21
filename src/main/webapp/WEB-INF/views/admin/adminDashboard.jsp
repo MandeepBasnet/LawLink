@@ -1,74 +1,74 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - LawLink</title>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - LawLink</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/WEB-INF/views/admin/css/style.css">
-</head>
-<body>
+    </head>
+    <body>
     <jsp:include page="common/header.jsp" />
-    
-    <div class="main-container">
+
+        <div class="main-container">
         <jsp:include page="common/sidebar.jsp">
             <jsp:param name="activePage" value="dashboard" />
         </jsp:include>
 
-        <div class="main-content">
-            <div class="dashboard-stats">
-                <div class="stat-card">
+            <div class="main-content">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
                     <img src="${pageContext.request.contextPath}/assets/icons/clients.png" alt="Clients" class="stat-icon">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">Clients</div>
-                </div>
-                <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                    <div class="stat-card">
                     <img src="${pageContext.request.contextPath}/assets/icons/lawyers.png" alt="Lawyers" class="stat-icon">
-                    <div class="stat-number">15</div>
-                    <div class="stat-label">Lawyers</div>
-                </div>
-                <div class="stat-card">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Lawyers</div>
+                    </div>
+                    <div class="stat-card">
                     <img src="${pageContext.request.contextPath}/assets/icons/appointments.png" alt="Appointments" class="stat-icon">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">Appointments</div>
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Appointments</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="recent-appointments">
-                <h2 class="section-title">Recent Appointments</h2>
-                <table class="appointments-table">
-                    <thead>
-                        <tr>
-                            <th>S.N.</th>
-                            <th>Client</th>
-                            <th>Date and Time</th>
-                            <th>Lawyer</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
+                <div class="recent-appointments">
+                    <h2 class="section-title">Recent Appointments</h2>
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>S.N.</th>
+                                <th>Client</th>
+                                <th>Date and Time</th>
+                                <th>Lawyer</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>
                                 <img src="${pageContext.request.contextPath}/assets/images/john.png" alt="John Thapa" class="client-avatar">
-                                John Thapa
-                            </td>
+                                    John Thapa
+                                </td>
                             <td>24th July, 2025,10 AM</td>
-                            <td>
+                                <td>
                                 <img src="${pageContext.request.contextPath}/assets/images/susasa.png" alt="Susasa Acharya" class="lawyer-avatar">
-                                Susasa Acharya
-                            </td>
-                            <td>
-                                <button class="action-btn">
+                                    Susasa Acharya
+                                </td>
+                                <td>
+                                    <button class="action-btn">
                                     <img src="${pageContext.request.contextPath}/assets/images/cancel_icon.svg" alt="Cancel">
-                                </button>
-                            </td>
-                        </tr>
+                                    </button>
+                                </td>
+                            </tr>
                         <!-- Add more rows as needed -->
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-</body>
-</html>
+    </body>
+    </html>

@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" %>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 <header class="main-header">
     <nav class="navbar">
         <div class="logo">
@@ -8,7 +9,7 @@
             </a>
         </div>
         <div class="nav-links">
-            <a href="${pageContext.request.contextPath}/">Home</a>
+            <a href="${pageContext.request.contextPath}/home">Home</a>
             <a href="${pageContext.request.contextPath}/appointment">Appointment</a>
             <a href="${pageContext.request.contextPath}/lawyers">lawyers</a>
             <a href="${pageContext.request.contextPath}/about-us">About Us</a>

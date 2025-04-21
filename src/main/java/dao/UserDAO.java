@@ -28,36 +28,33 @@ public class UserDAO {
      * @return true if successful, false otherwise
      */
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (username, password, password_salt, email, full_name, phone, address, role) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO users (username, password, email, full_name, phone, address, role, is_active) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getPasswordSalt());
-            stmt.setString(4, user.getEmail());
-            stmt.setString(5, user.getFullName());
-            stmt.setString(6, user.getPhone());
-            stmt.setString(7, user.getAddress());
-            stmt.setString(8, user.getRole());
-
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                // Get the generated user_id
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        user.setUserId(generatedKeys.getInt(1));
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setString(4, user.getFullName());
+            pstmt.setString(5, user.getPhone());
+            pstmt.setString(6, user.getAddress());
+            pstmt.setString(7, user.getRole());
+            pstmt.setBoolean(8, user.isActive());
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        user.setUserId(rs.getInt(1));
                         return true;
                     }
                 }
             }
-
             return false;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error creating user", e);
             return false;
         }
     }
@@ -94,24 +91,30 @@ public class UserDAO {
      * @return User object if found, null otherwise
      */
     public User getUserByUsername(String username) {
-        String sql = "SELECT * FROM Users WHERE username = ?";
-
+        String sql = "SELECT * FROM users WHERE username = ?";
         try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, username);
-
-            try (ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToUser(rs);
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setEmail(rs.getString("email"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setAddress(rs.getString("address"));
+                    user.setRole(rs.getString("role"));
+                    user.setActive(rs.getBoolean("is_active"));
+                    return user;
                 }
             }
-
-            return null;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            LOGGER.log(Level.SEVERE, "Error getting user by username", e);
         }
+        return null;
     }
 
     /**
@@ -195,7 +198,7 @@ public class UserDAO {
      * @return true if successful, false otherwise
      */
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET username = ?, password = ?, password_salt = ?, email = ?, " +
+        String sql = "UPDATE Users SET username = ?, password = ?, email = ?, " +
                 "full_name = ?, phone = ?, address = ?, role = ?, is_active = ?, " +
                 "profile_image = ?, session_token = ?, session_expiry = ?, " +
                 "reset_token = ?, reset_token_expiry = ?, otp = ?, otp_expiry = ? WHERE user_id = ?";
@@ -205,21 +208,20 @@ public class UserDAO {
 
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getPasswordSalt());
-            stmt.setString(4, user.getEmail());
-            stmt.setString(5, user.getFullName());
-            stmt.setString(6, user.getPhone());
-            stmt.setString(7, user.getAddress());
-            stmt.setString(8, user.getRole());
-            stmt.setBoolean(9, user.isActive());
-            stmt.setString(10, user.getProfileImage());
-            stmt.setString(11, user.getSessionToken());
-            stmt.setTimestamp(12, user.getSessionExpiry());
-            stmt.setString(13, user.getResetToken());
-            stmt.setTimestamp(14, user.getResetTokenExpiry());
-            stmt.setString(15, user.getOtp());
-            stmt.setTimestamp(16, user.getOtpExpiry());
-            stmt.setInt(17, user.getUserId());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getFullName());
+            stmt.setString(5, user.getPhone());
+            stmt.setString(6, user.getAddress());
+            stmt.setString(7, user.getRole());
+            stmt.setBoolean(8, user.isActive());
+            stmt.setString(9, user.getProfileImage());
+            stmt.setString(10, user.getSessionToken());
+            stmt.setTimestamp(11, user.getSessionExpiry());
+            stmt.setString(12, user.getResetToken());
+            stmt.setTimestamp(13, user.getResetTokenExpiry());
+            stmt.setString(14, user.getOtp());
+            stmt.setTimestamp(15, user.getOtpExpiry());
+            stmt.setInt(16, user.getUserId());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -295,6 +297,8 @@ public class UserDAO {
             return false;
         }
     }
+
+
 
     /**
      * Delete a user from the database
@@ -472,22 +476,12 @@ public class UserDAO {
         user.setUserId(rs.getInt("user_id"));
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
-        user.setPasswordSalt(rs.getString("password_salt"));
         user.setEmail(rs.getString("email"));
         user.setFullName(rs.getString("full_name"));
         user.setPhone(rs.getString("phone"));
         user.setAddress(rs.getString("address"));
         user.setRole(rs.getString("role"));
-        user.setRegistrationDate(rs.getTimestamp("registration_date"));
-        user.setLastLogin(rs.getTimestamp("last_login"));
         user.setActive(rs.getBoolean("is_active"));
-        user.setProfileImage(rs.getString("profile_image"));
-        user.setSessionToken(rs.getString("session_token"));
-        user.setSessionExpiry(rs.getTimestamp("session_expiry"));
-        user.setResetToken(rs.getString("reset_token"));
-        user.setResetTokenExpiry(rs.getTimestamp("reset_token_expiry"));
-        user.setOtp(rs.getString("otp"));
-        user.setOtpExpiry(rs.getTimestamp("otp_expiry"));
         return user;
     }
 
@@ -764,5 +758,77 @@ public class UserDAO {
         }
         
         return clients;
+    }
+
+    /**
+     * Authenticate a user by email and password
+     * @param email User's email
+     * @param password User's password
+     * @return User object if authentication successful, null otherwise
+     */
+    // FIX: Proper authenticate by email + password method
+    public User authenticateByEmail(String email, String password) {
+        try {
+            User user = getUserByEmail(email);
+            if (user != null && PasswordUtil.verifyPassword(password, user.getPassword())) {
+                updateLastLogin(user.getUserId());
+                return user;
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * Send a password reset email to the user
+     * @param email User's email address
+     * @return true if email was sent successfully, false otherwise
+     */
+    public boolean sendPasswordResetEmail(String email) {
+        User user = getUserByEmail(email);
+        if (user == null) {
+            // Return true even if user doesn't exist for security reasons
+            return true;
+        }
+
+        // Generate a reset token
+        String resetToken = generateResetToken();
+        boolean tokenSet = setResetToken(user.getUserId(), resetToken, 1); // 1 hour expiry
+
+        if (!tokenSet) {
+            return false;
+        }
+
+        // Send email with reset link
+        String resetLink = "http://localhost:8081/LawLink_war_exploded/reset-password?token=" + resetToken;
+        String subject = "Password Reset Request - LawLink";
+        String body = "Hello " + user.getFullName() + ",\n\n" +
+                "You have requested to reset your password. Please click the link below to reset your password:\n\n" +
+                resetLink + "\n\n" +
+                "This link will expire in 1 hour.\n\n" +
+                "If you did not request this password reset, please ignore this email.\n\n" +
+                "Best regards,\n" +
+                "LawLink Team";
+
+        try {
+            EmailUtil.sendEmail(user.getEmail(), subject, body);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Generate a secure reset token
+     * @return Generated reset token
+     */
+    private String generateResetToken() {
+        byte[] randomBytes = new byte[32];
+        new Random().nextBytes(randomBytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 }

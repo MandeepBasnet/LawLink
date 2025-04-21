@@ -11,20 +11,7 @@
 </head>
 <body>
 <!-- Header Section -->
-<header>
-    <div class="logo-container">
-        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo-img" onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg'">
-        <div class="logo-text">LawLink</div>
-    </div>
-    <nav>
-        <ul>
-            <c:set var="menuItems" value="${['Home', 'Appointment', 'Lawyers', 'About Us', 'Contact Us', 'Log In']}" />
-            <c:forEach var="item" items="${menuItems}">
-                <li><a href="${pageContext.request.contextPath}/${item.toLowerCase().replace(' ', '-')}">${item}</a></li>
-            </c:forEach>
-        </ul>
-    </nav>
-</header>
+<%@ include file="includes/header.jsp" %>
 
 <!-- Hero Section -->
 <section class="home-hero">
@@ -54,9 +41,8 @@
         <input type="text" name="query" placeholder="Search" class="home-search-input">
         <select name="practiceArea" class="home-search-dropdown">
             <option value="">Practice area</option>
-            <c:set var="practiceAreaItems" value="${['Criminal Law', 'Labour Law', 'International Law', 'Family Law', 'Property Law', 'Corporate Law']}" />
-            <c:forEach var="area" items="${practiceAreaItems}">
-                <option value="${area.id}">${area.name}</option>
+            <c:forEach var="area" items="${practiceAreas}">
+                <option value="${area.areaId}">${area.areaName}</option>
             </c:forEach>
         </select>
         <button type="submit" class="home-search-button">Search</button>
@@ -118,7 +104,7 @@
 <section class="testimonials-section">
     <h2 class="home-testimonials-heading">What does our client has to say about us?</h2>
     <div class="home-testimonial-container">
-        <c:forEach var="testimonial" items="${testimonials}" varStatus="status">
+        <!-- <c:forEach var="testimonial" items="${testimonials}" varStatus="status">
             <div class="home-testimonial-card">
                 <div class="home-testimonial-image">
                     <img src="${pageContext.request.contextPath}/assets/images/abc.png" alt="${testimonial.name}">
@@ -129,10 +115,10 @@
                     <p>${testimonial.content}</p>
                 </div>
             </div>
-        </c:forEach>
+        </c:forEach> -->
 
         <%-- Fallback if no testimonials are loaded from the database --%>
-        <c:if test="${empty testimonials}">
+        <!-- <c:if test="${empty testimonials}"> -->
             <div class="home-testimonial-card">
                 <div class="home-testimonial-image">
                     <img src="${pageContext.request.contextPath}/assets/images/john.png" alt="Client">
@@ -142,32 +128,13 @@
                     <p class="home-testimonial-position">Civil case client</p>
                     <p>I was facing a long and stressful property dispute, unsure if I'd ever find justice. But from the moment I consulted with Zaina, I knew I was in capable hands. Their deep understanding of the law, attention to detail, and calm professionalism helped me win the case confidently. I'm incredibly grateful for their support and highly recommend their services to anyone seeking legal guidance.</p>
                 </div>
-        </div>
-        </c:if>
+              </div>
+        <!-- </c:if> -->
     </div>
 </section>
 
 <!-- Footer -->
 <%@ include file="includes/footer.jsp" %>
 
-<%-- Optional: Add JavaScript at the end of the body --%>
-<script>
-    // You can add your JavaScript here
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Page loaded successfully');
-
-        // Example: Form validation
-        const searchForm = document.querySelector('.search-form');
-        if (searchForm) {
-            searchForm.addEventListener('submit', function(e) {
-                const searchInput = document.querySelector('.search-input');
-                if (searchInput.value.trim() === '') {
-                    e.preventDefault();
-                    alert('Please enter a search term');
-                }
-            });
-        }
-    });
-</script>
 </body>
 </html>

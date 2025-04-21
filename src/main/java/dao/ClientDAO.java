@@ -271,7 +271,6 @@ public class ClientDAO {
         client.setUserId(rs.getInt("user_id"));
         client.setUsername(rs.getString("username"));
         client.setPassword(rs.getString("password"));
-        client.setPasswordSalt(rs.getString("password_salt"));
         client.setEmail(rs.getString("email"));
         client.setFullName(rs.getString("full_name"));
         client.setPhone(rs.getString("phone"));

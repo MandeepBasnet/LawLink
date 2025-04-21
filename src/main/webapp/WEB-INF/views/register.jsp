@@ -6,45 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - LawLink</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #e5e5e5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            display: flex;
-            max-width: 1000px;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .register-image-container {
-                display: none;
-            }
-
-            .register-form-container {
-                width: 100%;
-                padding: 20px;
-            }
-        }
-    </style>
 </head>
 <body>
 <div class="container">

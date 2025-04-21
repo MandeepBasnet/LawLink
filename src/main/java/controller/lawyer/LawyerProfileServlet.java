@@ -5,21 +5,19 @@ import model.Lawyer;
 import model.User;
 import util.StringUtil;
 import util.ValidationUtil;
+import util.SessionUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-@WebServlet("/lawyer-profile")
+@WebServlet("/lawyer/lawyer-profile")
 public class LawyerProfileServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(LawyerProfileServlet.class.getName());
+    private static final Logger logger = Logger.getLogger(AboutLawyerServlet.class.getName());
     private LawyerDAO lawyerDAO;
 
     @Override
@@ -34,39 +32,37 @@ public class LawyerProfileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        User user = SessionUtil.getLoggedInUser(request);
 
-        if (currentUser == null || !"LAWYER".equals(currentUser.getRole())) {
-            response.sendRedirect("access-denied.jsp");
+        if (user == null || !"LAWYER".equals(user.getRole())) {
+            request.getRequestDispatcher("/WEB-INF/views/error/access-denied.jsp").forward(request, response);
             return;
         }
 
-        Lawyer lawyer = lawyerDAO.getLawyerById(currentUser.getUserId());
+        Lawyer lawyer = lawyerDAO.getLawyerById(user.getUserId());
 
         if (lawyer != null) {
             request.setAttribute("lawyer", lawyer);
-            request.getRequestDispatcher("lawyerProfile.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/lawyer/lawyerProfile.jsp").forward(request, response);
         } else {
-            response.sendRedirect("error.jsp");
+            request.getRequestDispatcher("/WEB-INF/views/error/error.jsp").forward(request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        User user = SessionUtil.getLoggedInUser(request);
 
-        if (currentUser == null || !"LAWYER".equals(currentUser.getRole())) {
-            response.sendRedirect("access-denied.jsp");
+        if (user == null || !"LAWYER".equals(user.getRole())) {
+            request.getRequestDispatcher("/WEB-INF/views/error/access-denied.jsp").forward(request, response);
             return;
         }
 
         try {
-            Lawyer lawyer = lawyerDAO.getLawyerById(currentUser.getUserId());
+            Lawyer lawyer = lawyerDAO.getLawyerById(user.getUserId());
 
             if (lawyer == null) {
-                response.sendRedirect("error.jsp");
+                request.getRequestDispatcher("/WEB-INF/views/error/error.jsp").forward(request, response);
                 return;
             }
 
@@ -77,11 +73,10 @@ public class LawyerProfileServlet extends HttpServlet {
             String practiceAreas = StringUtil.safeString(request.getParameter("practiceAreas"));
             String aboutMe = StringUtil.safeString(request.getParameter("aboutMe"));
 
-            // Basic validations
             if (!ValidationUtil.isValidPhone(phone)) {
                 request.setAttribute("error", "Invalid phone format.");
                 request.setAttribute("lawyer", lawyer);
-                request.getRequestDispatcher("lawyerProfile.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/lawyer/lawyerProfile.jsp").forward(request, response);
                 return;
             }
 
@@ -103,7 +98,6 @@ public class LawyerProfileServlet extends HttpServlet {
             request.setAttribute("error", "An error occurred while updating your profile");
         }
 
-        request.getRequestDispatcher("lawyerProfile.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/lawyer/lawyerProfile.jsp").forward(request, response);
     }
 }
-

@@ -1,20 +1,18 @@
 package controller;
 
-import model.User;
 import dao.UserDAO;
-import util.StringUtil;
-import util.EmailUtil;
-import exception.ServiceException;
+import util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Random;
 
 /**
- * Servlet to handle forgot password requests
+ * Servlet to handle forgot password functionality
  */
 @WebServlet("/forgot-password")
 public class ForgotPasswordServlet extends HttpServlet {
@@ -40,36 +38,33 @@ public class ForgotPasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String email = ValidationUtil.sanitizeInput(request.getParameter("email"));
 
-        String email = request.getParameter("email");
-
-        // Validate email
         if (email == null || email.trim().isEmpty()) {
             request.setAttribute("error", "Email is required");
             request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
             return;
         }
 
-        // Check if user exists
-        User user = userDAO.getUserByEmail(email);
-        if (user == null) {
-            request.setAttribute("error", "No account found with this email");
+        if (!ValidationUtil.isValidEmail(email)) {
+            request.setAttribute("error", "Invalid email format");
             request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
             return;
         }
 
-        // Generate and set reset token
-        String otp = generateOTP();
-        if (userDAO.setResetToken(user.getUserId(), otp, 1)) { // 1 hour expiry
-            request.setAttribute("message", "Password reset instructions have been sent to your email");
-        } else {
-            request.setAttribute("error", "Failed to process password reset request. Please try again.");
+        try {
+            boolean success = userDAO.sendPasswordResetEmail(email);
+            if (success) {
+                request.setAttribute("message", "If an account exists with this email, you will receive a password reset link.");
+            } else {
+                request.setAttribute("message", "If an account exists with this email, you will receive a password reset link.");
+                // We show the same message regardless for security reasons
+            }
+            request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred. Please try again later.");
+            request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
         }
-
-        request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
-    }
-
-    private String generateOTP() {
-        return String.format("%06d", new java.util.Random().nextInt(1000000));
     }
 }

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.math.BigDecimal;
 
-@WebServlet("/admin-add-lawyer")
+@WebServlet("/admin/admin-add-lawyer")
 public class AdminAddLawyerServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(AdminAddLawyerServlet.class.getName());
     private LawyerDAO lawyerDAO;

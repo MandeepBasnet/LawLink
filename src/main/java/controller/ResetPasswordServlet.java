@@ -1,6 +1,7 @@
 package controller;
 
 import dao.UserDAO;
+import util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -41,7 +42,7 @@ public class ResetPasswordServlet extends HttpServlet {
         // Verify token validity
         if (userDAO.getUserByResetToken(token) == null) {
             request.setAttribute("error", "Invalid or expired reset token");
-            request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
             return;
         }
 
@@ -68,6 +69,14 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
+        // Validate password
+        if (!ValidationUtil.isValidPassword(newPassword)) {
+            request.setAttribute("error", "Password must be at least 8 characters and contain both letters and numbers");
+            request.setAttribute("token", token);
+            request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
+            return;
+        }
+
         // Check if passwords match
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("error", "Passwords do not match");
@@ -81,7 +90,7 @@ public class ResetPasswordServlet extends HttpServlet {
         if (resetSuccessful) {
             // Password reset successful, redirect to login page with success message
             request.getSession().setAttribute("message", "Password reset successful. Please login with your new password.");
-            response.sendRedirect(request.getContextPath() + "/login");
+            response.sendRedirect(request.getContextPath() + "/log-in");
         } else {
             // Password reset failed
             request.setAttribute("error", "Password reset failed. Please try again.");

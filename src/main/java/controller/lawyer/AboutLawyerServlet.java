@@ -2,11 +2,13 @@ package controller.lawyer;
 
 import dao.LawyerDAO;
 import model.Lawyer;
+import model.User;
+import util.SessionUtil;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -28,23 +30,28 @@ public class AboutLawyerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Lawyer lawyer = (Lawyer) request.getSession().getAttribute("lawyer");
-        if (lawyer == null) {
-            response.sendRedirect("login.jsp");
+        User user = SessionUtil.getLoggedInUser(request);
+
+        if (user == null || !"LAWYER".equals(user.getRole())) {
+            request.getRequestDispatcher("/WEB-INF/views/error/access-denied.jsp").forward(request, response);
             return;
         }
 
+        Lawyer lawyer = lawyerDAO.getLawyerById(user.getUserId());
         request.setAttribute("lawyer", lawyer);
-        request.getRequestDispatcher("about-lawyer.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/lawyer/about-lawyer.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Lawyer lawyer = (Lawyer) request.getSession().getAttribute("lawyer");
-        if (lawyer == null) {
-            response.sendRedirect("login.jsp");
+        User user = SessionUtil.getLoggedInUser(request);
+
+        if (user == null || !"LAWYER".equals(user.getRole())) {
+            request.getRequestDispatcher("/WEB-INF/views/error/access-denied.jsp").forward(request, response);
             return;
         }
+
+        Lawyer lawyer = lawyerDAO.getLawyerById(user.getUserId());
 
         String aboutMe = request.getParameter("aboutMe");
         String education = request.getParameter("education");
@@ -57,13 +64,12 @@ public class AboutLawyerServlet extends HttpServlet {
         lawyer.setSpecialization(specialization);
 
         if (lawyerDAO.updateLawyer(lawyer)) {
-            request.getSession().setAttribute("lawyer", lawyer);
             request.setAttribute("success", "Profile updated successfully");
         } else {
             request.setAttribute("error", "Failed to update profile");
         }
 
-        request.getRequestDispatcher("about-lawyer.jsp").forward(request, response);
+        request.setAttribute("lawyer", lawyer);
+        request.getRequestDispatcher("/WEB-INF/views/lawyer/about-lawyer.jsp").forward(request, response);
     }
 }
-

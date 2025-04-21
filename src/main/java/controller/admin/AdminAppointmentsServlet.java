@@ -11,7 +11,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/admin-appointments")
+@WebServlet("/admin/admin-appointments")
 public class AdminAppointmentsServlet extends HttpServlet {
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
 

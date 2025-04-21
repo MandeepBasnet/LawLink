@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * Servlet to handle user profile operations
  */
-@WebServlet("/my-profile")
+@WebServlet("/client/my-profile")
 public class ProfileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;

@@ -383,7 +383,6 @@ public class LawyerDAO {
         lawyer.setUserId(rs.getInt("user_id"));
         lawyer.setUsername(rs.getString("username"));
         lawyer.setPassword(rs.getString("password"));
-        lawyer.setPasswordSalt(rs.getString("password_salt"));
         lawyer.setEmail(rs.getString("email"));
         lawyer.setFullName(rs.getString("full_name"));
         lawyer.setPhone(rs.getString("phone"));

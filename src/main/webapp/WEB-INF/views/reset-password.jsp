@@ -6,30 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Password</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background-color: #d3d3d3;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background-color: #9ca3af;
-      border-radius: 20px;
-      padding: 40px;
-      width: 100%;
-      max-width: 500px;
-    }
-  </style>
 </head>
 <body>
 <div class="container">
