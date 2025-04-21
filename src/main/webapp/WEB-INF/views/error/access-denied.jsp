@@ -1,4 +1,4 @@
-<jsp:include page="../common/header.jsp">
+<jsp:include page="../includes/header.jsp">
     <jsp:param name="title" value="Access Denied" />
 </jsp:include>
 
@@ -11,4 +11,4 @@
     </div>
 </div>
 
-<jsp:include page="../common/footer.jsp" />
+<jsp:include page="../includes/footer.jsp" />

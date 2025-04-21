@@ -12,7 +12,7 @@ public class Main {
         Tomcat tomcat = new Tomcat();
         
         // Set port
-        tomcat.setPort(8081);
+        tomcat.setPort(8080);
         
         // Set base directory
         String baseDir = new File("target/tomcat").getAbsolutePath();
@@ -31,7 +31,7 @@ public class Main {
         
         // Start server
         tomcat.start();
-        System.out.println("Tomcat server started on port 8081");
+        System.out.println("Tomcat server started on port 8080");
         tomcat.getServer().await();
     }
 } 

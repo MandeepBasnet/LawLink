@@ -1,13 +1,14 @@
 package controller;
 
-import service.UserService;
-
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Servlet to handle password reset
@@ -16,26 +17,35 @@ import java.io.IOException;
 public class ResetPasswordServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private UserService userService = new UserService();
+    private UserDAO userDAO;
+
+    @Override
+    public void init() throws ServletException {
+        try {
+            userDAO = new UserDAO();
+        } catch (SQLException e) {
+            throw new ServletException("Failed to initialize UserDAO", e);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String token = request.getParameter("token");
-        String userId = request.getParameter("userId");
-
-        // Validate input
-        if (token == null || token.trim().isEmpty() || userId == null || userId.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+        if (token == null || token.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/forgot-password");
             return;
         }
 
-        // Store token and userId in request attributes
-        request.setAttribute("token", token);
-        request.setAttribute("userId", userId);
+        // Verify token validity
+        if (userDAO.getUserByResetToken(token) == null) {
+            request.setAttribute("error", "Invalid or expired reset token");
+            request.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(request, response);
+            return;
+        }
 
-        // Forward to the reset password page
+        request.setAttribute("token", token);
         request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
     }
 
@@ -54,7 +64,6 @@ public class ResetPasswordServlet extends HttpServlet {
 
             request.setAttribute("error", "All fields are required");
             request.setAttribute("token", token);
-            request.setAttribute("userId", request.getParameter("userId"));
             request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
             return;
         }
@@ -63,23 +72,20 @@ public class ResetPasswordServlet extends HttpServlet {
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("error", "Passwords do not match");
             request.setAttribute("token", token);
-            request.setAttribute("userId", request.getParameter("userId"));
             request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
             return;
         }
 
-        // Reset password
-        boolean resetSuccessful = userService.resetPassword(token, newPassword);
+        boolean resetSuccessful = userDAO.resetPassword(token, newPassword);
 
         if (resetSuccessful) {
             // Password reset successful, redirect to login page with success message
-            request.getSession().setAttribute("message", "Password reset successful. Please log in with your new password.");
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            request.getSession().setAttribute("message", "Password reset successful. Please login with your new password.");
+            response.sendRedirect(request.getContextPath() + "/login");
         } else {
             // Password reset failed
-            request.setAttribute("error", "Password reset failed. The link may have expired or is invalid.");
+            request.setAttribute("error", "Password reset failed. Please try again.");
             request.setAttribute("token", token);
-            request.setAttribute("userId", request.getParameter("userId"));
             request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
         }
     }

@@ -25,6 +25,7 @@ public class User {
     private Timestamp resetTokenExpiry;
     private String otp;
     private Timestamp otpExpiry;
+    private Timestamp createdAt;
 
     // Default constructor
     public User() {
@@ -191,6 +192,14 @@ public class User {
 
     public void setOtpExpiry(Timestamp otpExpiry) {
         this.otpExpiry = otpExpiry;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override

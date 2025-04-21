@@ -1,206 +1,109 @@
 package util;
 
-import jakarta.mail.*;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import java.util.Properties;
-import java.util.Random;
 
 /**
- * Utility class for sending emails
+ * Utility class for sending emails with Jakarta Mail
  */
 public class EmailUtil {
-
-    private static final String HOST = "smtp.gmail.com";
-    private static final String PORT = "587";
-    private static final String USERNAME = "your-email@gmail.com"; // Replace with your email
-    private static final String PASSWORD = "your-app-password"; // Replace with your app password
-
+    private static final Logger LOGGER = Logger.getLogger(EmailUtil.class.getName());
+    
+    // SMTP server settings - would be better to load from properties file
+    private static final String SMTP_HOST = "smtp.gmail.com";
+    private static final String SMTP_PORT = "587";
+    private static final String EMAIL_USERNAME = "np05cp4a230108@iic.edu.np"; // Replace with actual email
+    private static final String EMAIL_PASSWORD = "clut egwy wvwb jdtg"; // Replace with app password
+    private static final String EMAIL_FROM = "np05cp4a230108@iic.edu.np";
+    
     /**
-     * Send an email
-     * @param to Recipient email address
+     * Sends an email using SMTP
+     * 
+     * @param toEmail Recipient email address
      * @param subject Email subject
-     * @param body Email body
-     * @return true if successful, false otherwise
+     * @param body Email body (HTML)
+     * @return true if sent successfully, false otherwise
      */
-    public static boolean sendEmail(String to, String subject, String body) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", HOST);
-        props.put("mail.smtp.port", PORT);
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(USERNAME, PASSWORD);
-            }
-        });
-
+    public static boolean sendEmail(String toEmail, String subject, String body) {
         try {
+            Properties props = new Properties();
+            props.put("mail.smtp.host", SMTP_HOST);
+            props.put("mail.smtp.port", SMTP_PORT);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            
+            // Create session with authentication
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(EMAIL_USERNAME, EMAIL_PASSWORD);
+                }
+            });
+            
+            // Create and send message
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(USERNAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setFrom(new InternetAddress(EMAIL_FROM));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject(subject);
-            message.setContent(body, "text/html; charset=utf-8");
-
+            message.setContent(body, "text/html");
+            
             Transport.send(message);
+            
+            LOGGER.log(Level.INFO, "Email sent successfully to: {0}", toEmail);
             return true;
+            
         } catch (MessagingException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to send email to: " + toEmail, e);
             return false;
         }
     }
-
+    
     /**
-     * Generate a random OTP
-     * @return OTP string
+     * Send OTP email for password reset
+     * 
+     * @param email Recipient email
+     * @param otp One-time password
+     * @param expiryMinutes Expiry time in minutes
+     * @return true if sent successfully, false otherwise
      */
-    public static String generateOTP() {
-        Random random = new Random();
-        int otp = 100000 + random.nextInt(900000);
-        return String.valueOf(otp);
+    public static boolean sendPasswordResetOTP(String email, String otp, int expiryMinutes) {
+        String subject = "LawLink - Password Reset OTP";
+    
+        String body = """
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; border-top: 4px solid #2563eb;">
+                    <h2 style="color: #2563eb; margin-top: 0;">Password Reset Request</h2>
+                    <p>We received a request to reset your password for your <strong>LawLink</strong> account. Please use the following One-Time Password (OTP) to complete your password reset:</p>
+                    
+                    <div style="background-color: #e2e8f0; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+                        <h3 style="font-size: 24px; margin: 0; letter-spacing: 5px; color: #1e293b;">%s</h3>
+                    </div>
+                    
+                    <p>This OTP will expire in <strong>%d minutes</strong>.</p>
+                    
+                    <p style="margin-top: 30px; font-size: 13px; color: #64748b;">
+                        If you did not request a password reset, please ignore this email or contact our support team.
+                    </p>
+                    
+                    <p style="margin-top: 30px; font-size: 13px; color: #64748b;">
+                        &copy; LawLink. All rights reserved.
+                    </p>
+                </div>
+            </body>
+            </html>
+            """.formatted(otp, expiryMinutes);
+    
+        return sendEmail(email, subject, body);
     }
-
-    /**
-     * Send an OTP email
-     * @param to Recipient email address
-     * @param otp OTP to send
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendOTPEmail(String to, String otp) {
-        String subject = "LawLink Email Verification OTP";
-        String body = "<html><body>"
-                + "<h2>LawLink Email Verification</h2>"
-                + "<p>Your OTP for email verification is:</p>"
-                + "<h3>" + otp + "</h3>"
-                + "<p>This OTP will expire in 5 minutes.</p>"
-                + "</body></html>";
-
-        return sendEmail(to, subject, body);
-    }
-
-    /**
-     * Send a password reset email
-     * @param to Recipient email address
-     * @param resetToken Reset token
-     * @param userId User ID
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendPasswordResetEmail(String to, String resetToken, int userId) {
-        String subject = "LawLink Password Reset";
-        String resetLink = "http://localhost:8080/LawLink/reset-password?token=" + resetToken + "&userId=" + userId;
-
-        String body = "<html><body>"
-                + "<h2>LawLink Password Reset</h2>"
-                + "<p>You have requested to reset your password. Click the link below to reset your password:</p>"
-                + "<p><a href=\"" + resetLink + "\">Reset Password</a></p>"
-                + "<p>If you did not request a password reset, please ignore this email.</p>"
-                + "<p>This link will expire in 24 hours.</p>"
-                + "</body></html>";
-
-        return sendEmail(to, subject, body);
-    }
-
-    /**
-     * Send a welcome email
-     * @param to Recipient email address
-     * @param fullName Full name of the recipient
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendWelcomeEmail(String to, String fullName) {
-        String subject = "Welcome to LawLink";
-
-        String body = "<html><body>"
-                + "<h2>Welcome to LawLink!</h2>"
-                + "<p>Dear " + fullName + ",</p>"
-                + "<p>Thank you for registering with LawLink. We are excited to have you on board!</p>"
-                + "<p>With LawLink, you can:</p>"
-                + "<ul>"
-                + "<li>Find and book appointments with trusted lawyers</li>"
-                + "<li>Manage your appointments</li>"
-                + "<li>Leave reviews for lawyers</li>"
-                + "</ul>"
-                + "<p>If you have any questions, please don't hesitate to contact us.</p>"
-                + "<p>Best regards,<br>The LawLink Team</p>"
-                + "</body></html>";
-
-        return sendEmail(to, subject, body);
-    }
-
-    /**
-     * Send an appointment confirmation email
-     * @param to Recipient email address
-     * @param fullName Full name of the recipient
-     * @param lawyerName Name of the lawyer
-     * @param appointmentDate Date of the appointment
-     * @param appointmentTime Time of the appointment
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendAppointmentConfirmationEmail(String to, String fullName, String lawyerName,
-                                                           String appointmentDate, String appointmentTime) {
-        String subject = "LawLink Appointment Confirmation";
-
-        String body = "<html><body>"
-                + "<h2>Appointment Confirmation</h2>"
-                + "<p>Dear " + fullName + ",</p>"
-                + "<p>Your appointment with " + lawyerName + " has been confirmed for:</p>"
-                + "<p><strong>Date:</strong> " + appointmentDate + "</p>"
-                + "<p><strong>Time:</strong> " + appointmentTime + "</p>"
-                + "<p>If you need to cancel or reschedule your appointment, please log in to your account.</p>"
-                + "<p>Best regards,<br>The LawLink Team</p>"
-                + "</body></html>";
-
-        return sendEmail(to, subject, body);
-    }
-
-    /**
-     * Send an appointment cancellation email
-     * @param to Recipient email address
-     * @param fullName Full name of the recipient
-     * @param lawyerName Name of the lawyer
-     * @param appointmentDate Date of the appointment
-     * @param appointmentTime Time of the appointment
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendAppointmentCancellationEmail(String to, String fullName, String lawyerName,
-                                                           String appointmentDate, String appointmentTime) {
-        String subject = "LawLink Appointment Cancellation";
-
-        String body = "<html><body>"
-                + "<h2>Appointment Cancellation</h2>"
-                + "<p>Dear " + fullName + ",</p>"
-                + "<p>Your appointment with " + lawyerName + " scheduled for:</p>"
-                + "<p><strong>Date:</strong> " + appointmentDate + "</p>"
-                + "<p><strong>Time:</strong> " + appointmentTime + "</p>"
-                + "<p>has been cancelled.</p>"
-                + "<p>If you would like to book a new appointment, please log in to your account.</p>"
-                + "<p>Best regards,<br>The LawLink Team</p>"
-                + "</body></html>";
-
-        return sendEmail(to, subject, body);
-    }
-
-    /**
-     * Send a contact form email
-     * @param name Name of the sender
-     * @param email Email of the sender
-     * @param subject Subject of the message
-     * @param message Message content
-     * @return true if successful, false otherwise
-     */
-    public static boolean sendContactEmail(String name, String email, String subject, String message) {
-        String emailSubject = "Contact Form: " + subject;
-
-        String emailBody = "<html><body>"
-                + "<h2>New Contact Form Submission</h2>"
-                + "<p><strong>Name:</strong> " + name + "</p>"
-                + "<p><strong>Email:</strong> " + email + "</p>"
-                + "<p><strong>Subject:</strong> " + subject + "</p>"
-                + "<p><strong>Message:</strong></p>"
-                + "<p>" + message + "</p>"
-                + "</body></html>";
-
-        return sendEmail(USERNAME, emailSubject, emailBody);
-    }
-}
+} 

@@ -1,16 +1,17 @@
 package controller;
 
+import dao.UserDAO;
 import model.User;
-import service.UserService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
+
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Servlet to handle user login
@@ -19,7 +20,6 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,49 +50,39 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String rememberMe = request.getParameter("rememberMe");
+        boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
-        // Validate input
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Username and password are required");
-            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
-            return;
-        }
+        try {
+            UserDAO userDAO = new UserDAO();
+            User user = userDAO.authenticate(username, password);
 
-        // Authenticate user
-        User user = userService.authenticateUser(username, password);
+            if (user != null) {
+                // Create session
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
 
-        if (user != null) {
-            // Authentication successful, create session
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
+                // Create session token if remember me is checked
+                if (rememberMe) {
+                    userDAO.createSessionToken(user.getUserId(), true);
+                }
 
-            // Check if "Remember Me" is selected
-            if (rememberMe != null && rememberMe.equals("on")) {
-                // Create a session token
-                String sessionToken = userService.createSessionToken(user.getUserId(), true);
-
-                // Create a cookie
-                Cookie cookie = new Cookie("rememberMe", sessionToken);
-                cookie.setMaxAge(30 * 24 * 60 * 60); // 30 days
-                cookie.setPath("/");
-                response.addCookie(cookie);
+                // Redirect based on role
+                if ("admin".equals(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                } else if ("lawyer".equals(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/lawyer/dashboard");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/client/dashboard");
+                }
+            } else {
+                request.setAttribute("error", "Invalid username or password");
+                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             }
-
-            // Redirect to the appropriate dashboard
-            if (user.getRole().equals("ADMIN")) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-            } else if (user.getRole().equals("LAWYER")) {
-                response.sendRedirect(request.getContextPath() + "/lawyer/dashboard");
-            } else if (user.getRole().equals("CLIENT")) {
-                response.sendRedirect(request.getContextPath() + "/client/dashboard");
-            }
-        } else {
-            // Authentication failed
-            request.setAttribute("error", "Invalid username or password");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred. Please try again later.");
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }

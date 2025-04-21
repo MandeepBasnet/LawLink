@@ -1,7 +1,7 @@
 package controller;
 
 import model.User;
-import service.UserService;
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import org.json.JSONObject;
 
 /**
  * Servlet to handle OTP verification
@@ -18,14 +20,15 @@ import java.io.IOException;
 public class VerifyOTPServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private UserService userService = new UserService();
+    private UserDAO userDAO;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        // Forward to the verify OTP page
-        request.getRequestDispatcher("/WEB-INF/views/verify-otp.jsp").forward(request, response);
+    public void init() throws ServletException {
+        try {
+            userDAO = new UserDAO();
+        } catch (SQLException e) {
+            throw new ServletException("Failed to initialize UserDAO", e);
+        }
     }
 
     @Override
@@ -33,34 +36,52 @@ public class VerifyOTPServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        JSONObject jsonResponse = new JSONObject();
+
+        if (session == null || session.getAttribute("otpUserId") == null) {
+            jsonResponse.put("success", false);
+            jsonResponse.put("message", "Session expired. Please request a new OTP.");
+            sendJsonResponse(response, jsonResponse);
             return;
         }
 
-        int userId = (int) session.getAttribute("userId");
         String otp = request.getParameter("otp");
-
-        // Validate input
         if (otp == null || otp.trim().isEmpty()) {
-            request.setAttribute("error", "OTP is required");
-            request.getRequestDispatcher("/WEB-INF/views/verify-otp.jsp").forward(request, response);
+            jsonResponse.put("success", false);
+            jsonResponse.put("message", "OTP is required");
+            sendJsonResponse(response, jsonResponse);
             return;
         }
 
-        // Verify OTP
-        boolean otpVerified = userService.verifyOTP(userId, otp);
+        int userId = (int) session.getAttribute("otpUserId");
+        boolean otpVerified = userDAO.verifyOTP(userId, otp);
 
         if (otpVerified) {
-            // OTP verification successful, redirect to reset password page
-            request.setAttribute("token", request.getParameter("token"));
-            request.setAttribute("userId", userId);
-            request.getSession().removeAttribute("userId");
-            request.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(request, response);
+            // Generate reset token for password reset
+            String resetToken = generateResetToken();
+            if (userDAO.setResetToken(userId, resetToken, 1)) { // 1 hour expiry
+                jsonResponse.put("success", true);
+                jsonResponse.put("resetToken", resetToken);
+                jsonResponse.put("message", "OTP verified successfully");
+            } else {
+                jsonResponse.put("success", false);
+                jsonResponse.put("message", "Failed to generate reset token");
+            }
         } else {
-            // OTP verification failed
-            request.setAttribute("error", "Invalid or expired OTP. Please try again.");
-            request.getRequestDispatcher("/WEB-INF/views/verify-otp.jsp").forward(request, response);
+            jsonResponse.put("success", false);
+            jsonResponse.put("message", "Invalid OTP");
         }
+
+        sendJsonResponse(response, jsonResponse);
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, JSONObject jsonResponse) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse.toString());
+    }
+
+    private String generateResetToken() {
+        return java.util.UUID.randomUUID().toString();
     }
 }

@@ -2,30 +2,52 @@ package dao;
 
 import model.Client;
 import util.DBConnectionUtil;
+import util.PasswordUtil;
+import util.EmailUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Data Access Object for Client entity
  */
 public class ClientDAO {
 
-    private UserDAO userDAO = new UserDAO();
+    private static final Logger LOGGER = Logger.getLogger(ClientDAO.class.getName());
+    private UserDAO userDAO;
 
     /**
-     * Create a new client in the database
-     * @param client Client object to create
-     * @return true if successful, false otherwise
+     * Constructor for ClientDAO
+     * @throws SQLException if a database access error occurs
      */
-    public boolean createClient(Client client) {
+    public ClientDAO() throws SQLException {
+        this.userDAO = new UserDAO();
+    }
+
+    /**
+     * Register a new client in the database
+     * @param client Client object to register
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database access error occurs
+     */
+    public boolean registerClient(Client client) throws SQLException {
         Connection conn = null;
         PreparedStatement stmt = null;
 
         try {
             conn = DBConnectionUtil.getConnection();
             conn.setAutoCommit(false);
+
+            // Hash the password
+            String hashedPassword = PasswordUtil.hashPassword(client.getPassword());
+            if (hashedPassword == null) {
+                LOGGER.log(Level.SEVERE, "Failed to hash password for client: {0}", client.getEmail());
+                return false;
+            }
+            client.setPassword(hashedPassword);
 
             // First, create the user record
             boolean userCreated = userDAO.createUser(client);
@@ -54,6 +76,27 @@ public class ClientDAO {
             if (rowsAffected > 0) {
                 client.setClientId(client.getUserId());
                 conn.commit();
+
+                // Send welcome email
+                try {
+                    String subject = "Welcome to LawLink";
+                    String body = "<h1>Welcome to LawLink!</h1>" +
+                            "<p>Dear " + client.getFullName() + ",</p>" +
+                            "<p>Thank you for registering with LawLink. We're excited to have you on board!</p>" +
+                            "<p>You can now:</p>" +
+                            "<ul>" +
+                            "<li>Search for lawyers</li>" +
+                            "<li>Book appointments</li>" +
+                            "<li>Manage your profile</li>" +
+                            "</ul>" +
+                            "<p>If you have any questions, please don't hesitate to contact us.</p>" +
+                            "<p>Best regards,<br>The LawLink Team</p>";
+
+                    EmailUtil.sendEmail(client.getEmail(), subject, body);
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Failed to send welcome email to " + client.getEmail(), e);
+                }
+
                 return true;
             } else {
                 conn.rollback();
@@ -65,10 +108,10 @@ public class ClientDAO {
                     conn.rollback();
                 }
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to rollback transaction", ex);
             }
-            e.printStackTrace();
-            return false;
+            LOGGER.log(Level.SEVERE, "Failed to register client", e);
+            throw e;
         } finally {
             try {
                 if (stmt != null) {
@@ -79,7 +122,7 @@ public class ClientDAO {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close database resources", e);
             }
         }
     }

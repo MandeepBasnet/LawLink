@@ -1,16 +1,13 @@
 package controller;
 
 import model.User;
-import service.UserService;
-
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
+
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Servlet to handle user logout
@@ -19,43 +16,46 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private UserService userService = new UserService();
+    private UserDAO userDAO;
+
+    @Override
+    public void init() throws ServletException {
+        try {
+            userDAO = new UserDAO();
+        } catch (SQLException e) {
+            throw new ServletException("Failed to initialize UserDAO", e);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get the user from the session
         HttpSession session = request.getSession(false);
-
         if (session != null) {
             User user = (User) session.getAttribute("user");
-
             if (user != null) {
-                // Clear the user's session token
-                userService.clearSessionToken(user.getUserId());
+                // Clear session token in database
+                userDAO.clearSessionToken(user.getUserId());
             }
-
-            // Invalidate the session
+            // Invalidate session
             session.invalidate();
         }
 
-        // Remove the "Remember Me" cookie
+        // Clear session cookie if exists
         Cookie[] cookies = request.getCookies();
-
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("rememberMe")) {
+                if (cookie.getName().equals("JSESSIONID")) {
                     cookie.setValue("");
                     cookie.setMaxAge(0);
-                    cookie.setPath("/");
                     response.addCookie(cookie);
                     break;
                 }
             }
         }
 
-        // Redirect to the login page
+        // Redirect to login page
         response.sendRedirect(request.getContextPath() + "/login");
     }
 }

@@ -14,6 +14,17 @@
         <session-timeout>30</session-timeout>
     </session-config>
 
+    <!-- Security configuration for development -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>All Resources</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
     <error-page>
         <error-code>404</error-code>
         <location>/WEB-INF/views/error/404.jsp</location>

@@ -1,264 +1,173 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="common/header.jsp">
-    <jsp:param name="title" value="Home" />
-</jsp:include>
-<jsp:include page="common/assets-include.jsp" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LawLink - Legal Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+</head>
+<body>
+<!-- Header Section -->
+<header>
+    <div class="logo-container">
+        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo-img" onerror="this.src='${pageContext.request.contextPath}/images/placeholder.svg'">
+        <div class="logo-text">LawLink</div>
+    </div>
+    <nav>
+        <ul>
+            <c:set var="menuItems" value="${['Home', 'Appointment', 'Lawyers', 'About Us', 'Contact Us', 'Log In']}" />
+            <c:forEach var="item" items="${menuItems}">
+                <li><a href="${pageContext.request.contextPath}/${item.toLowerCase().replace(' ', '-')}">${item}</a></li>
+            </c:forEach>
+        </ul>
+    </nav>
+</header>
 
-<div class="hero" style="background-image: url('${pageContext.request.contextPath}/assets/images/hero-bg.jpg'); background-size: cover; background-position: center;">
-    <div class="container">
-        <div class="hero-content">
-            <h1>Book Appointment With Trusted Lawyers</h1>
-            <p>Connect with experienced lawyers for all your legal needs</p>
-            <a href="${pageContext.request.contextPath}/lawyers" class="btn btn-light">Find a Lawyer</a>
+<!-- Hero Section -->
+<section class="home-hero">
+        <div class="home-hero-content">
+        <h1>Innocent until proven guilty.</h1>
+        <p>Organize your task through our LawLink.<br>we provide the best services.</p>
+        <a href="${pageContext.request.contextPath}/appointment" class="home-cta-button">Book your appointment</a>
+        <div class="home-phone-number">
+            <span class="phone-icon"><i class="fas fa-phone"></i></span>
+            <span>or call us at<br>${contactPhone}</span>
         </div>
     </div>
-</div>
-
-<section class="practice-areas">
-    <div class="container">
-        <h2 class="text-center">Find by Practice Area</h2>
-        <p class="text-center">Browse through our extensive list of trusted lawyers and select the one that best suits your needs</p>
-        <div class="practice-area-grid" id="practice-area-grid">
-            <c:forEach items="${practiceAreas}" var="area">
-                <a href="${pageContext.request.contextPath}/lawyers?area=${area.areaName}" class="practice-area-card">
-                    <div class="practice-area-icon">
-                        <i class="fas fa-balance-scale"></i>
-                    </div>
-                    <h3>${area.areaName}</h3>
-                </a>
-            </c:forEach>
+    <div class="home-hero-image">
+        <img src="${pageContext.request.contextPath}/assets/images/jeniffer.png" alt="Professional Lawyer">
+        <div class="home-experience-badge">
+            10+ Year<br>of<br>experience
         </div>
     </div>
 </section>
 
-<section class="top-lawyers">
-    <div class="container">
-        <h2 class="text-center">Top Lawyers</h2>
-        <p class="text-center">Here is a list of top lawyers in the country</p>
-        <div class="lawyer-grid" id="top-lawyers-grid">
-            <c:forEach items="${topLawyers}" var="lawyer">
-                <div class="lawyer-card">
-                    <div class="lawyer-image">
-                        <img src="${pageContext.request.contextPath}/${not empty lawyer.profileImage ? lawyer.profileImage : 'assets/images/default-profile.jpg'}" alt="${lawyer.fullName}">
+<!-- Search Section -->
+<section class="home-search-section">
+    <div class="home-search-heading">
+        <p>Search by the name of attorney<br>and practice areas.</p>
+    </div>
+    <form action="${pageContext.request.contextPath}/search" method="get" class="home-search-form">
+        <input type="text" name="query" placeholder="Search" class="home-search-input">
+        <select name="practiceArea" class="home-search-dropdown">
+            <option value="">Practice area</option>
+            <c:set var="practiceAreaItems" value="${['Criminal Law', 'Labour Law', 'International Law', 'Family Law', 'Property Law', 'Corporate Law']}" />
+            <c:forEach var="area" items="${practiceAreaItems}">
+                <option value="${area.id}">${area.name}</option>
+            </c:forEach>
+        </select>
+        <button type="submit" class="home-search-button">Search</button>
+    </form>
+</section>
+
+<!-- Attorneys Section -->
+<section class="home-attorneys-section">
+    <div class="home-attorneys-heading">
+        <h2>MEET OUR MOST<br>TALANTED ATTORNEYS</h2>
                     </div>
-                    <div class="lawyer-info">
-                        <div class="lawyer-availability ${lawyer.available ? 'available' : 'unavailable'}">
-                            <span class="status-dot"></span>
-                            <span>${lawyer.available ? 'Available' : 'Unavailable'}</span>
+    <div class="home-attorneys-description">
+        <p>Their work involves legal research, courtroom representation, and the protection of both civil and criminal rights. With deep knowledge of the law, they stand as protectors of individual and public rights.</p>
                         </div>
-                        <h3>${lawyer.fullName}</h3>
-                        <p>${lawyer.specialization}</p>
-                        <div class="lawyer-rating">
-                            <c:forEach begin="1" end="5" var="i">
-                                <i class="fas fa-star ${i <= lawyer.rating ? 'active' : ''}"></i>
-                            </c:forEach>
-                            <span>(${lawyer.rating})</span>
+    <div class="home-attorneys-cta">
+        <a href="${pageContext.request.contextPath}/appointment" class="home-book-appointment-btn">Book appointment</a>
                         </div>
-                        <a href="${pageContext.request.contextPath}/lawyers/profile/${lawyer.lawyerId}" class="btn btn-primary">View Profile</a>
+</section>
+
+<!-- Attorney Profiles -->
+<section class="home-attorney-profiles">
+    <c:forEach var="attorney" items="${attorneys}" varStatus="status">
+        <div class="home-attorney-card">
+            <img src="${pageContext.request.contextPath}/assets/images/${attorney.imageFile}" alt="${attorney.name}">
+            <div class="home-attorney-info">
+                <h3>${attorney.name}</h3>
+                <p>${attorney.description}</p>
                     </div>
                 </div>
             </c:forEach>
+
+    <%-- Fallback if no attorneys are loaded from the database --%>
+    <c:if test="${empty attorneys}">
+        <div class="home-attorney-card">
+            <img src="${pageContext.request.contextPath}/assets/images/zaina-rai.png" alt="Attorney Profile">
+            <div class="home-attorney-info">
+                <h3>Zaina Rai</h3>
+                <p>She has won 100+ case till now one of the most demanding attorney at your service.</p>
+            </div>
         </div>
-        <div class="text-center mt-3">
-            <a href="${pageContext.request.contextPath}/lawyers" class="btn btn-secondary">View All Lawyers</a>
+        <div class="home-attorney-card">
+            <img src="${pageContext.request.contextPath}/assets/images/rayan-rajbangsi.png" alt="Attorney Profile">
+            <div class="home-attorney-info">
+                <h3>Rayan Raibangsi</h3>
+                <p>With the experience of 5 years he has been thriving in our company.</p>
+            </div>
         </div>
+        <div class="home-attorney-card">
+            <img src="${pageContext.request.contextPath}/assets/images/baviyan-koirala.png" alt="Attorney Profile">
+            <div class="home-attorney-info">
+                <h3>Baviyan Koirala</h3>
+                <p>One of our most demanding attorney, with the 95% of success.</p>
+        </div>
+    </div>
+    </c:if>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <h2 class="home-testimonials-heading">What does our client has to say about us?</h2>
+    <div class="home-testimonial-container">
+        <c:forEach var="testimonial" items="${testimonials}" varStatus="status">
+            <div class="home-testimonial-card">
+                <div class="home-testimonial-image">
+                    <img src="${pageContext.request.contextPath}/assets/images/abc.png" alt="${testimonial.name}">
+                </div>
+                <div class="home-testimonial-content">
+                    <h3>${testimonial.name}</h3>
+                    <p class="home-testimonial-position">${testimonial.position}</p>
+                    <p>${testimonial.content}</p>
+                </div>
+            </div>
+        </c:forEach>
+
+        <%-- Fallback if no testimonials are loaded from the database --%>
+        <c:if test="${empty testimonials}">
+            <div class="home-testimonial-card">
+                <div class="home-testimonial-image">
+                    <img src="${pageContext.request.contextPath}/assets/images/john.png" alt="Client">
+                </div>
+                <div class="home-testimonial-content">
+                    <h3>Jhon Basnet</h3>
+                    <p class="home-testimonial-position">Civil case client</p>
+                    <p>I was facing a long and stressful property dispute, unsure if I'd ever find justice. But from the moment I consulted with Zaina, I knew I was in capable hands. Their deep understanding of the law, attention to detail, and calm professionalism helped me win the case confidently. I'm incredibly grateful for their support and highly recommend their services to anyone seeking legal guidance.</p>
+                </div>
+        </div>
+        </c:if>
     </div>
 </section>
 
-<section class="cta">
-    <div class="container">
-        <div class="cta-content">
-            <h2>Book Appointment Now</h2>
-            <p>Connect with trusted lawyers for all your legal needs</p>
-            <a href="${pageContext.request.contextPath}/register" class="btn btn-light">Create Account</a>
-        </div>
-    </div>
-</section>
+<!-- Footer -->
+<%@ include file="includes/footer.jsp" %>
 
-<!-- Include JavaScript to initialize the assets -->
+<%-- Optional: Add JavaScript at the end of the body --%>
 <script>
+    // You can add your JavaScript here
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we need to use the demo practice area data
-        const practiceAreaGrid = document.getElementById('practice-area-grid');
-        if (practiceAreaGrid && practiceAreaGrid.children.length === 0 && window.practiceData) {
-            window.practiceData.forEach(area => {
-                const areaCard = document.createElement('a');
-                areaCard.className = 'practice-area-card';
-                areaCard.href = '${pageContext.request.contextPath}/lawyers?area=' + encodeURIComponent(area.practice);
+        console.log('Page loaded successfully');
 
-                areaCard.innerHTML = `
-                    <div class="practice-area-icon">
-                        <img src="${area.image}" alt="${area.practice}">
-                    </div>
-                    <h3>${area.practice}</h3>
-                `;
-
-                practiceAreaGrid.appendChild(areaCard);
-            });
-        }
-
-        // Check if we need to use the demo lawyer data
-        const topLawyersGrid = document.getElementById('top-lawyers-grid');
-        if (topLawyersGrid && topLawyersGrid.children.length === 0 && window.lawyers) {
-            // Display only the first 8 lawyers
-            const topLawyers = window.lawyers.slice(0, 8);
-
-            topLawyers.forEach(lawyer => {
-                const lawyerCard = document.createElement('div');
-                lawyerCard.className = 'lawyer-card';
-
-                lawyerCard.innerHTML = `
-                    <div class="lawyer-image">
-                        <img src="${lawyer.image}" alt="${lawyer.name}">
-                    </div>
-                    <div class="lawyer-info">
-                        <div class="lawyer-availability available">
-                            <span class="status-dot"></span>
-                            <span>Available</span>
-                        </div>
-                        <h3>${lawyer.name}</h3>
-                        <p>${lawyer.practice}</p>
-                        <div class="lawyer-rating">
-                            <i class="fas fa-star active"></i>
-                            <i class="fas fa-star active"></i>
-                            <i class="fas fa-star active"></i>
-                            <i class="fas fa-star active"></i>
-                            <i class="fas fa-star"></i>
-                            <span>(4.0)</span>
-                        </div>
-                        <a href="${pageContext.request.contextPath}/lawyers/profile/${lawyer._id}" class="btn btn-primary">View Profile</a>
-                    </div>
-                `;
-
-                topLawyersGrid.appendChild(lawyerCard);
+        // Example: Form validation
+        const searchForm = document.querySelector('.search-form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const searchInput = document.querySelector('.search-input');
+                if (searchInput.value.trim() === '') {
+                    e.preventDefault();
+                    alert('Please enter a search term');
+                }
             });
         }
     });
 </script>
-
-<style>
-    .practice-area-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .practice-area-card {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        text-decoration: none;
-        color: #333;
-        transition: transform 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .practice-area-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .practice-area-icon {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .practice-area-icon img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .practice-area-card h3 {
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    .lawyer-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .lawyer-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .lawyer-image {
-        position: relative;
-        width: 100%;
-        padding-top: 75%;
-        overflow: hidden;
-    }
-
-    .lawyer-image img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .lawyer-info {
-        padding: 15px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .lawyer-info h3 {
-        margin: 10px 0;
-        font-size: 1.2rem;
-    }
-
-    .lawyer-info p {
-        margin: 5px 0;
-        color: #666;
-    }
-
-    .lawyer-rating {
-        margin: 10px 0;
-    }
-
-    .lawyer-availability {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-
-    .available .status-dot {
-        background-color: #28a745;
-    }
-
-    .unavailable .status-dot {
-        background-color: #dc3545;
-    }
-
-    .btn-primary {
-        margin-top: auto;
-        width: 100%;
-    }
-</style>
-
-<jsp:include page="common/footer.jsp" />
+</body>
+</html>

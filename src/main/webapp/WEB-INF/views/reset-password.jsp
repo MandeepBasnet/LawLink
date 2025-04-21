@@ -1,41 +1,62 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<jsp:include page="common/header.jsp">
-  <jsp:param name="title" value="Reset Password" />
-</jsp:include>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password</title>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
-<div class="auth-container">
-  <div class="card auth-card">
-    <div class="card-header">
-      <h2 class="text-center">Reset Password</h2>
+    body {
+      background-color: #d3d3d3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #9ca3af;
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="${pageContext.request.contextPath}/home" class="reset-password-back-link">
+    <span class="reset-password-back-arrow">◀</span> Back to Website
+  </a>
+
+  <h1 class="reset-password-title">Reset Password</h1>
+
+  <form action="${pageContext.request.contextPath}/reset-password" method="post">
+    <div class="reset-password-form-group">
+      <label for="current-password" class="reset-password-label">Current Password</label>
+      <input type="password" id="current-password" name="currentPassword" required class="reset-password-input">
     </div>
-    <div class="card-body">
-      <form action="${pageContext.request.contextPath}/reset-password" method="post" class="needs-validation">
-        <input type="hidden" name="token" value="${token}">
-        <input type="hidden" name="userId" value="${userId}">
-        <div class="form-group">
-          <label for="newPassword">New Password</label>
-          <div class="password-input">
-            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-            <span class="password-toggle" data-target="newPassword">
-                            <i class="fas fa-eye"></i>
-                        </span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <div class="password-input">
-            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-            <span class="password-toggle" data-target="confirmPassword">
-                            <i class="fas fa-eye"></i>
-                        </span>
-          </div>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
-        </div>
-      </form>
+
+    <div class="reset-password-form-group">
+      <label for="new-password" class="reset-password-label">New Password</label>
+      <input type="password" id="new-password" name="newPassword" required class="reset-password-input">
     </div>
-  </div>
+
+    <div class="reset-password-form-group">
+      <label for="confirm-password" class="reset-password-label">New Password</label>
+      <input type="password" id="confirm-password" name="confirmPassword" required class="reset-password-input">
+    </div>
+
+    <button type="submit" class="reset-password-button">Change Password</button>
+  </form>
 </div>
-
-<jsp:include page="common/footer.jsp" />
+</body>
+</html>

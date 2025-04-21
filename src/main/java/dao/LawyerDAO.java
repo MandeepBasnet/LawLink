@@ -12,7 +12,15 @@ import java.util.List;
  */
 public class LawyerDAO {
 
-    private UserDAO userDAO = new UserDAO();
+    private UserDAO userDAO;
+
+    /**
+     * Constructor for LawyerDAO
+     * @throws SQLException if there is an error initializing the UserDAO
+     */
+    public LawyerDAO() throws SQLException {
+        this.userDAO = new UserDAO();
+    }
 
     /**
      * Create a new lawyer in the database

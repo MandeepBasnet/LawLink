@@ -115,11 +115,57 @@ INSERT INTO PracticeAreas (area_name, description, image) VALUES
 ('Family Law', 'Legal issues related to family relationships, divorce, child custody, etc.', 'family-law.png'),
 ('Criminal Law', 'Legal defense and prosecution for criminal offenses', 'criminal-law.png'),
 ('Corporate Law', 'Legal services for businesses, corporations, and commercial entities', 'corporate-law.png'),
-('Labor Law', 'Legal matters related to employment, workplace rights, and regulations', 'labor-law.png'),
+('Labour Law', 'Legal matters related to employment, workplace rights, and regulations', 'labour-law.png'),
 ('International Law', 'Legal issues crossing international boundaries and jurisdictions', 'international-law.png');
 
--- Insert default admin
-INSERT INTO Users (username, password, email, full_name, role)
-VALUES ('admin', '$2a$10$XFE/oW.Lz6wAOej7vdCUj.p1QK/SAGpVnO1V1oCGHxqBzUCfA7SBu', 'admin@lawlink.com', 'System Administrator', 'ADMIN');
+-- Insert admin users (password: admin123)
+INSERT INTO Users (username, password, email, full_name, phone, role, is_active) VALUES
+    ('admin', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'admin@lawlink.com', 'System Administrator', '+977-9812345678', 'ADMIN', true);
 
-INSERT INTO Admins (admin_id) VALUES (LAST_INSERT_ID());
+-- Insert lawyers (password: admin123)
+INSERT INTO Users (username, password, email, full_name, phone, address, role, profile_image, is_active) VALUES
+                                                                                                             ('zaina.raj', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'zaina.raj@lawlink.com', 'Zaina Raj', '+977-9086706541', 'Itahari', 'LAWYER', 'zaina.jpg', true),
+                                                                                                             ('rayan.rajbangsi', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'rayan.rajbangsi@lawlink.com', 'Rayan Rajbangsi', '+977-9705523049', 'Itahari', 'LAWYER', 'rayan.jpg', true),
+                                                                                                             ('manish.khanal', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'manish.khanal@lawlink.com', 'MANISH KHANAL', '+977-9812395010', 'Kathmandu', 'LAWYER', 'manish.jpg', true),
+                                                                                                             ('baviyan.koirala', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'baviyan.koirala@lawlink.com', 'Baviyan Koirala', '+977-9867063791', 'Itahari', 'LAWYER', 'baviyan.jpg', true),
+                                                                                                             ('lalita.puri', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'lalita.puri@lawlink.com', 'Lalita Puri', '+977-9706146926', 'Biratnagar', 'LAWYER', 'lalita.jpg', true),
+                                                                                                             ('ashutosh.srivastava', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'ashutosh.srivastava@lawlink.com', 'Ashutosh Srivastava', '+977-9823543129', 'Morang', 'LAWYER', 'ashutosh.jpg', true),
+                                                                                                             ('yusha.shrestha', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'yusha.shrestha@lawlink.com', 'Yusha Shrestha', '+977-9703304911', 'Tarahara', 'LAWYER', 'yusha.jpg', true),
+                                                                                                             ('anish.basnet', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'anish.basnet@lawlink.com', 'Anish Basnet', '+977-9708203041', 'Jhapa', 'LAWYER', 'anish.jpg', true),
+                                                                                                             ('susasa.acharya', '$2a$10$QFkc5TYJ0FYG9J5FKgzCp.MuKqGJI1ohYm7AHJUdB0QMtYwZYdH4e', 'susasa.acharya@lawlink.com', 'SUSASA ACHARYA', '+977-9703129941', 'Biratnagar', 'LAWYER', 'susasa.jpg', true);
+
+-- Insert lawyer details
+INSERT INTO Lawyers (lawyer_id, specialization, practice_areas, experience_years, education, license_number, about_me, consultation_fee, is_verified, is_available, rating)
+SELECT u.user_id,
+       CASE
+           WHEN u.username = 'zaina.raj' THEN 'Property Law'
+           WHEN u.username = 'rayan.rajbangsi' THEN 'Criminal Law'
+           WHEN u.username = 'manish.khanal' THEN 'Family Law'
+           WHEN u.username = 'baviyan.koirala' THEN 'Corporate Law'
+           WHEN u.username = 'lalita.puri' THEN 'International Law'
+           WHEN u.username = 'ashutosh.srivastava' THEN 'Labour Law'
+           WHEN u.username = 'yusha.shrestha' THEN 'Property Law'
+           WHEN u.username = 'anish.basnet' THEN 'Criminal Law'
+           WHEN u.username = 'susasa.acharya' THEN 'Family Law'
+           END as specialization,
+       CASE
+           WHEN u.username = 'zaina.raj' THEN 'Property Law, Corporate Law'
+           WHEN u.username = 'rayan.rajbangsi' THEN 'Criminal Law, International Law'
+           WHEN u.username = 'manish.khanal' THEN 'Family Law, Labour Law'
+           WHEN u.username = 'baviyan.koirala' THEN 'Corporate Law, Property Law'
+           WHEN u.username = 'lalita.puri' THEN 'International Law, Family Law'
+           WHEN u.username = 'ashutosh.srivastava' THEN 'Labour Law, Criminal Law'
+           WHEN u.username = 'yusha.shrestha' THEN 'Property Law, Family Law'
+           WHEN u.username = 'anish.basnet' THEN 'Criminal Law, Corporate Law'
+           WHEN u.username = 'susasa.acharya' THEN 'Family Law, International Law'
+           END as practice_areas,
+       FLOOR(RAND() * 10) + 5 as experience_years,
+       'LLB, Bar Council of Nepal' as education,
+       CONCAT('NPL', LPAD(FLOOR(RAND() * 10000), 4, '0')) as license_number,
+       CONCAT('Experienced lawyer specializing in ') as about_me,
+       FLOOR(RAND() * (5000 - 2000 + 1)) + 2000 as consultation_fee,
+       true as is_verified,
+       true as is_available,
+       ROUND(RAND() * 2 + 3, 1) as rating
+FROM Users u
+WHERE u.role = 'LAWYER';

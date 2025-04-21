@@ -2,15 +2,25 @@ package dao;
 
 import model.User;
 import util.DBConnectionUtil;
-
+import util.PasswordUtil;
+import util.EmailUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Data Access Object for User entity
  */
 public class UserDAO {
+    private static final Logger LOGGER = Logger.getLogger(UserDAO.class.getName());
+    private final Connection conn;
+
+    public UserDAO() throws SQLException {
+        conn = DBConnectionUtil.getConnection();
+    }
 
     /**
      * Create a new user in the database
@@ -479,5 +489,280 @@ public class UserDAO {
         user.setOtp(rs.getString("otp"));
         user.setOtpExpiry(rs.getTimestamp("otp_expiry"));
         return user;
+    }
+
+    /**
+     * Register a new user
+     * @param user User object to register
+     * @return true if successful, false otherwise
+     */
+    public boolean registerUser(User user) {
+        try {
+            // Hash password using BCrypt
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            user.setPassword(hashedPassword);
+
+            return createUser(user);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to register user", e);
+            return false;
+        }
+    }
+
+    /**
+     * Authenticate a user
+     * @param username Username
+     * @param password Password
+     * @return User object if authenticated, null otherwise
+     */
+    public User authenticate(String username, String password) {
+        try {
+            User user = getUserByUsername(username);
+            if (user != null && PasswordUtil.verifyPassword(password, user.getPassword())) {
+                updateLastLogin(user.getUserId());
+                return user;
+            }
+            return null;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to authenticate user", e);
+            return null;
+        }
+    }
+
+    /**
+     * Change a user's password after verifying the current password
+     * @param userId User ID
+     * @param currentPassword Current password to verify
+     * @param newPassword New password to set
+     * @return true if successful, false otherwise
+     */
+    public boolean changePassword(int userId, String currentPassword, String newPassword) {
+        try {
+            // Get the user to verify current password
+            User user = getUserById(userId);
+            if (user == null) {
+                return false;
+            }
+
+            // Verify current password
+            if (!PasswordUtil.verifyPassword(currentPassword, user.getPassword())) {
+                return false;
+            }
+
+            // Hash and update the new password
+            String hashedPassword = PasswordUtil.hashPassword(newPassword);
+            return updatePassword(userId, hashedPassword);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to change password", e);
+            return false;
+        }
+    }
+
+    /**
+     * Request OTP for password reset
+     * @param email User's email
+     * @return true if OTP was sent successfully, false otherwise
+     */
+    public boolean requestOTP(String email) {
+        try {
+            User user = getUserByEmail(email);
+            if (user == null) {
+                return false;
+            }
+
+            // Generate OTP
+            String otp = generateOTP();
+            Timestamp otpExpiry = new Timestamp(System.currentTimeMillis() + (30 * 60 * 1000)); // 30 minutes
+
+            // Update user with OTP
+            user.setOtp(otp);
+            user.setOtpExpiry(otpExpiry);
+            if (!updateUser(user)) {
+                return false;
+            }
+
+            // Send OTP via email
+            String subject = "Your OTP for Password Reset";
+            String message = "Your OTP is: " + otp + "\nThis OTP will expire in 30 minutes.";
+            return EmailUtil.sendEmail(email, subject, message);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to request OTP", e);
+            return false;
+        }
+    }
+
+    /**
+     * Verify OTP for password reset
+     * @param userId User ID
+     * @param otp OTP to verify
+     * @return true if OTP is valid, false otherwise
+     */
+    public boolean verifyOTP(int userId, String otp) {
+        try {
+            User user = getUserById(userId);
+            if (user == null || user.getOtp() == null || user.getOtpExpiry() == null) {
+                return false;
+            }
+
+            // Check if OTP matches and hasn't expired
+            if (user.getOtp().equals(otp) && user.getOtpExpiry().after(new Timestamp(System.currentTimeMillis()))) {
+                // Clear OTP after successful verification
+                clearOTP(userId);
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to verify OTP", e);
+            return false;
+        }
+    }
+
+    /**
+     * Reset user's password using reset token
+     * @param token Reset token
+     * @param newPassword New password
+     * @return true if successful, false otherwise
+     */
+    public boolean resetPassword(String token, String newPassword) {
+        try {
+            User user = getUserByResetToken(token);
+            if (user == null) {
+                return false;
+            }
+
+            // Hash the new password
+            String hashedPassword = PasswordUtil.hashPassword(newPassword);
+            user.setPassword(hashedPassword);
+            user.setResetToken(null);
+            user.setResetTokenExpiry(null);
+
+            return updateUser(user);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to reset password", e);
+            return false;
+        }
+    }
+
+    /**
+     * Create a session token for a user
+     * @param userId User ID
+     * @param rememberMe Whether to create a long-term session
+     * @return true if successful, false otherwise
+     */
+    public boolean createSessionToken(int userId, boolean rememberMe) {
+        try {
+            // Generate a random session token
+            String sessionToken = java.util.UUID.randomUUID().toString();
+            
+            // Calculate expiry time (24 hours for normal sessions, 30 days for remember me)
+            int expiryHours = rememberMe ? 720 : 24; // 720 hours = 30 days
+            
+            // Create expiry timestamp
+            java.sql.Timestamp expiryTime = new java.sql.Timestamp(
+                System.currentTimeMillis() + (expiryHours * 60 * 60 * 1000L)
+            );
+            
+            return updateSessionToken(userId, sessionToken, expiryTime);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to create session token", e);
+            return false;
+        }
+    }
+
+    /**
+     * Update a user's profile
+     * @param user User object with updated profile information
+     * @return true if successful, false otherwise
+     */
+    public boolean updateUserProfile(User user) {
+        try {
+            User existingUser = getUserById(user.getUserId());
+            if (existingUser == null) {
+                return false;
+            }
+
+            // Only update profile-related fields
+            existingUser.setFullName(user.getFullName());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setAddress(user.getAddress());
+            existingUser.setProfileImage(user.getProfileImage());
+
+            return updateUser(existingUser);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to update user profile", e);
+            return false;
+        }
+    }
+
+    /**
+     * Generate a random OTP
+     * @return 6-digit OTP
+     */
+    private String generateOTP() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
+    }
+
+    /**
+     * Update a user's password
+     * @param userId User ID
+     * @param hashedPassword Hashed password
+     * @return true if successful, false otherwise
+     */
+    private boolean updatePassword(int userId, String hashedPassword) {
+        String sql = "UPDATE Users SET password = ? WHERE user_id = ?";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, hashedPassword);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to update password", e);
+            return false;
+        }
+    }
+
+    public void close() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<User> getAllClients() throws SQLException {
+        List<User> clients = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE role = 'CLIENT'";
+        
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                User client = new User();
+                client.setUserId(rs.getInt("user_id"));
+                client.setUsername(rs.getString("username"));
+                client.setEmail(rs.getString("email"));
+                client.setFullName(rs.getString("full_name"));
+                client.setRole(rs.getString("role"));
+                client.setPhone(rs.getString("phone"));
+                client.setAddress(rs.getString("address"));
+                client.setProfileImage(rs.getString("profile_image"));
+                client.setCreatedAt(rs.getTimestamp("created_at"));
+                clients.add(client);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error retrieving all clients: " + e.getMessage());
+            throw e;
+        }
+        
+        return clients;
     }
 }

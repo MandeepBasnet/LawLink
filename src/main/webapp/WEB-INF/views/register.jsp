@@ -1,54 +1,104 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<jsp:include page="common/header.jsp">
-    <jsp:param name="title" value="Register" />
-</jsp:include>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - LawLink</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-<div class="auth-container">
-    <div class="card auth-card">
-        <div class="card-header">
-            <h2 class="text-center">Register</h2>
-        </div>
-        <div class="card-body">
-            <form action="${pageContext.request.contextPath}/register" method="post" class="needs-validation">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+        body {
+            background-color: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .register-image-container {
+                display: none;
+            }
+
+            .register-form-container {
+                width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="register-image-container">
+        <img src="${pageContext.request.contextPath}/images/lady-justice.png" alt="Lady Justice statue">
+    </div>
+    <div class="register-form-container">
+        <div class="register-form-content">
+            <h1 class="register-form-title">Register</h1>
+            <p class="register-form-subtitle">Enter your Personal details to create your account</p>
+
+            <c:if test="${not empty error}">
+                <div class="error">${error}</div>
+            </c:if>
+
+            <form action="${pageContext.request.contextPath}/register" method="post">
+                <div class="register-form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
                 </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                <div class="register-form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                <div class="register-form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="password-input">
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <span class="password-toggle" data-target="password">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
+                <div class="register-form-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" required>
                 </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <div class="password-input">
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                        <span class="password-toggle" data-target="confirmPassword">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
+                <div class="register-form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                <div class="register-form-group">
+                    <label for="address">Address:</label>
+                    <textarea id="address" name="address" required></textarea>
                 </div>
+                <div class="register-form-group">
+                    <input type="text" name="profilePicture" placeholder="Profile Picture">
+                </div>
+                <button type="submit" class="register-form-button">Register</button>
             </form>
-        </div>
-        <div class="card-footer text-center">
-            Already have an account? <a href="${pageContext.request.contextPath}/login">Login</a>
+
+            <div class="register-login-section">
+                <span class="register-login-text">Already Have An Account?</span>
+                <a href="${pageContext.request.contextPath}/login">
+                    <button type="button" class="register-login-btn">LOG IN</button>
+                </a>
+            </div>
         </div>
     </div>
 </div>
-
-<jsp:include page="common/footer.jsp" />
+</body>
+</html>
