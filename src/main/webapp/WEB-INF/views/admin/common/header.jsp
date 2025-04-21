@@ -15,6 +15,10 @@
         <img src="${pageContext.request.contextPath}/assets/images/profile_pic.png" alt="Admin" class="user-avatar">
         <span>John Doe</span>
         <span>Admin</span>
-        <button class="logout-btn">Logout</button>
+
+        <form action="${pageContext.request.contextPath}/logout" method="get" style="display:inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
     </div>
 </div>
+

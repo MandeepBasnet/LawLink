@@ -10,6 +10,8 @@
             <span class="user-name">Hari Narayan Acharya</span>
             <span class="user-role">Lawyer</span>
         </div>
-        <button class="btn-logout">Logout</button>
+        <form action="${pageContext.request.contextPath}/logout" method="get" style="display:inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
     </div>
 </header> 
