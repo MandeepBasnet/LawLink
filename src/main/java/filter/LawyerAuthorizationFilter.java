@@ -1,13 +1,15 @@
 package filter;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.*;
 import model.User;
 
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/lawyerDashboard.jsp", "/aboutLawyer.jsp", "/lawyerProfile.jsp", "/allReviews.jsp"})
+@WebFilter("/lawyer/*")
 public class LawyerAuthorizationFilter implements Filter {
 
     @Override
@@ -18,17 +20,15 @@ public class LawyerAuthorizationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        if (session == null || session.getAttribute("currentUser") == null) {
-            res.sendRedirect("access-denied.jsp");
-            return;
+        if (session != null && session.getAttribute("user") != null) {
+            User user = (User) session.getAttribute("user");
+
+            if ("LAWYER".equalsIgnoreCase(user.getRole())) {
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
-        User user = (User) session.getAttribute("currentUser");
-
-        if (user != null && "LAWYER".equals(user.getRole())) {
-            chain.doFilter(request, response);
-        } else {
-            res.sendRedirect("access-denied.jsp");
-        }
+        res.sendRedirect(req.getContextPath() + "/access-denied.jsp");
     }
 }

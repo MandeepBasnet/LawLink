@@ -7,6 +7,11 @@ import java.util.regex.Pattern;
  */
 public class ValidationUtil {
 
+    public static boolean isEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+
     // Email validation pattern
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");

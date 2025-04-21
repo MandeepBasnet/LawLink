@@ -265,3 +265,6 @@ SELECT l.lawyer_id, p.area_id
 FROM Lawyers l
 CROSS JOIN PracticeAreas p
 WHERE RAND() < 0.5; -- Randomly assign practice areas to lawyers
+
+UPDATE users
+SET password = '$2a$10$/n4cAJAuieAlz95eM1myw.ZEBilpGXVivrDmDWTTHhbllgj7pYwre';

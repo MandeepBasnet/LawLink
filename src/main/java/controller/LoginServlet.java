@@ -2,104 +2,91 @@ package controller;
 
 import dao.UserDAO;
 import model.User;
+import util.PasswordUtil;
 import util.ValidationUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
-/**
- * Servlet to handle user login
- */
 @WebServlet("/log-in")
 public class LoginServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Check if the user is already logged in
         HttpSession session = request.getSession(false);
-
         if (session != null && session.getAttribute("user") != null) {
-            // User is already logged in, redirect to the appropriate dashboard
             User user = (User) session.getAttribute("user");
-
-            if (user.getRole().equals("ADMIN")) {
-                response.sendRedirect(request.getContextPath() + "/admin/admin-dashboard");
-            } else if (user.getRole().equals("LAWYER")) {
-                response.sendRedirect(request.getContextPath() + "/lawyer/lawyer-dashboard");
-            } else if (user.getRole().equals("CLIENT")) {
-                response.sendRedirect(request.getContextPath() + "/client/my-appointments");
-            }
-
+            redirectToDashboard(request, response, user);
             return;
         }
 
-        // User is not logged in, forward to the login page
-        request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String email = ValidationUtil.sanitizeInput(request.getParameter("email"));
+
+        String email = request.getParameter("email").trim(); // 🔥 No sanitizeInput here
         String password = request.getParameter("password");
-        boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
-        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Email and password are required");
-            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
-            return;
-        }
-
-        if (!ValidationUtil.isValidEmail(email)) {
-            request.setAttribute("error", "Invalid email format");
-            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+        if (ValidationUtil.isEmpty(email) || ValidationUtil.isEmpty(password)) {
+            request.setAttribute("error", "Email and password are required.");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
 
         try {
             UserDAO userDAO = new UserDAO();
-            User user = userDAO.authenticateByEmail(email, password);
+            User user = userDAO.getUserByEmail(email);
 
-            if (user != null) {
-                // Create session
-                HttpSession session = request.getSession();
+            if (user != null && PasswordUtil.verifyPassword(password, user.getPassword())) {
+                HttpSession session = request.getSession(true);
                 session.setAttribute("user", user);
+                session.setMaxInactiveInterval(30 * 60);
 
-                // Create session token if remember me is checked
-                if (rememberMe) {
-                    userDAO.createSessionToken(user.getUserId(), true);
-                }
+                System.out.println("✅ Login successful for: " + user.getEmail() + " | Role: " + user.getRole());
 
-                // Redirect based on role
-                if ("ADMIN".equalsIgnoreCase(user.getRole())) {
-                    response.sendRedirect(request.getContextPath() + "/admin/admin-dashboard");
-                } else if ("LAWYER".equalsIgnoreCase(user.getRole())) {
-                    response.sendRedirect(request.getContextPath() + "/lawyer/lawyer-dashboard");
-                } else if ("CLIENT".equalsIgnoreCase(user.getRole())) {
-                    response.sendRedirect(request.getContextPath() + "/client/my-appointments");
-                } else {
-                    // If role is not recognized, redirect to home
-                    response.sendRedirect(request.getContextPath() + "/home");
-                }
+                redirectToDashboard(request, response, user);
             } else {
-                request.setAttribute("error", "Invalid email or password");
-                request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+                System.out.println("❌ Login failed: Invalid email or password for email: " + email);
+
+                request.setAttribute("error", "Invalid email or password.");
+                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "An error occurred. Please try again later.");
-            request.getRequestDispatcher("/WEB-INF/views/log-in.jsp").forward(request, response);
+            request.setAttribute("error", "Internal server error. Please try again later.");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
+
+
+    private void redirectToDashboard(HttpServletRequest request, HttpServletResponse response, User user)
+            throws IOException {
+
+        String contextPath = request.getContextPath();
+        String role = user.getRole();
+
+        System.out.println("🚀 Redirecting user role: " + role);
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            response.sendRedirect(contextPath + "/admin/admin-dashboard");
+        } else if ("LAWYER".equalsIgnoreCase(role)) {
+            response.sendRedirect(contextPath + "/lawyer/lawyer-dashboard");
+        } else if ("CLIENT".equalsIgnoreCase(role)) {
+            response.sendRedirect(contextPath + "/client/my-appointments");
+        } else {
+            // If role is somehow unknown, redirect safely to home
+            response.sendRedirect(contextPath + "/home");
+        }
+    }
+
 }

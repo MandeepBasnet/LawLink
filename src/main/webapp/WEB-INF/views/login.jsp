@@ -12,7 +12,7 @@ pageEncoding="UTF-8"%>
     <div class="container">
       <div class="log-in-image-container">
         <img
-          src="${pageContext.request.contextPath}/assets/images/legal-background.jpg"
+          src="${pageContext.request.contextPath}/assets/images/legal_background.jpg"
           alt="Legal background with gavel and books"
         />
       </div>

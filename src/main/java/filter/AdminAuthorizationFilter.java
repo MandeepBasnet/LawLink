@@ -3,7 +3,6 @@ package filter;
 import java.io.IOException;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -17,31 +16,21 @@ import model.User;
 public class AdminAuthorizationFilter implements Filter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpSession session = httpRequest.getSession(false);
-        
-        boolean isAdmin = false;
+
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        HttpSession session = req.getSession(false);
+
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            isAdmin = "ADMIN".equals(user.getRole());
+            if (user.getRole().equalsIgnoreCase("ADMIN")) {
+                chain.doFilter(request, response);
+                return;
+            }
         }
-        
-        if (isAdmin) {
-            chain.doFilter(request, response);
-        } else {
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/access-denied");
-        }
-    }
 
-    @Override
-    public void destroy() {
+        res.sendRedirect(req.getContextPath() + "/access-denied.jsp");
     }
-} 
+}

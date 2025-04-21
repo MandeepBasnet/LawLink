@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
 
-@WebServlet("/book-appointment")
+@WebServlet("/client/book-appointment")
 public class BookAppointmentServlet extends HttpServlet {
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
 
@@ -22,7 +22,7 @@ public class BookAppointmentServlet extends HttpServlet {
         User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
         if (currentUser == null || !"CLIENT".equals(currentUser.getRole())) {
-            response.sendRedirect("log-in.jsp");
+            response.sendRedirect("login.jsp");
             return;
         }
 
