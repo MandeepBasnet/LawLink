@@ -208,7 +208,7 @@
 <!-- Navigation Bar -->
 <div class="navbar">
   <div class="logo-container">
-    <img src="${pageContext.request.contextPath}/images/logo.png" alt="LawLink Logo" class="logo-img">
+    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo-img">
     <span class="logo-text">LawLink</span>
   </div>
 
@@ -216,17 +216,17 @@
     <a href="${pageContext.request.contextPath}/home">Home</a>
     <a href="${pageContext.request.contextPath}/appointment">Appointment</a>
     <a href="${pageContext.request.contextPath}/lawyers">Lawyers</a>
-    <a href="${pageContext.request.contextPath}/about">About Us</a>
-    <a href="${pageContext.request.contextPath}/contact">Contact Us</a>
+    <a href="${pageContext.request.contextPath}/about-us">About Us</a>
+    <a href="${pageContext.request.contextPath}/contact-us">Contact Us</a>
   </div>
 
   <div class="profile-container">
-    <img src="${pageContext.request.contextPath}/images/profile.jpg" alt="Profile" class="profile-img">
+    <img src="${pageContext.request.contextPath}/assets/images/upload_area.png" alt="Profile" class="profile-img">
     <span class="dropdown-icon">▼</span>
 
     <div class="dropdown-menu">
-      <a href="${pageContext.request.contextPath}/my-profile"><div class="dropdown-item active">My Profile</div></a>
-      <a href="${pageContext.request.contextPath}/my-appointments"><div class="dropdown-item">My Appointments</div></a>
+      <a href="${pageContext.request.contextPath}/client/my-profile"><div class="dropdown-item">My Profile</div></a>
+      <a href="${pageContext.request.contextPath}/client/my-appointments"><div class="dropdown-item active">My Appointments</div></a>
       <a href="${pageContext.request.contextPath}/logout"><div class="dropdown-item">Logout</div></a>
     </div>
   </div>
@@ -238,7 +238,7 @@
 
   <div class="profile-content">
     <div class="profile-images">
-      <img src="${pageContext.request.contextPath}/images/users/john.jpg" alt="John Thapa" class="user-img">
+      <img src="${pageContext.request.contextPath}/assets/images/john.png" alt="John Thapa" class="user-img">
       <div class="default-avatar">
         <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#c9d1f5"/>

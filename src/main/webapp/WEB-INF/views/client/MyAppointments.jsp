@@ -169,13 +169,18 @@
       background-color: #a3e07a;
       color: black;
     }
+
+    .btn-leave_review {
+      background-color: #3a444a;
+      color: black;
+    }
   </style>
 </head>
 <body>
 <!-- Navigation Bar -->
 <div class="navbar">
   <div class="logo-container">
-    <img src="${pageContext.request.contextPath}/images/logo.png" alt="LawLink Logo" class="logo-img">
+    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo-img">
     <span class="logo-text">LawLink</span>
   </div>
 
@@ -183,17 +188,17 @@
     <a href="${pageContext.request.contextPath}/home">Home</a>
     <a href="${pageContext.request.contextPath}/appointment">Appointment</a>
     <a href="${pageContext.request.contextPath}/lawyers">Lawyers</a>
-    <a href="${pageContext.request.contextPath}/about">About Us</a>
-    <a href="${pageContext.request.contextPath}/contact">Contact Us</a>
+    <a href="${pageContext.request.contextPath}/about-us">About Us</a>
+    <a href="${pageContext.request.contextPath}/contact-us">Contact Us</a>
   </div>
 
   <div class="profile-container">
-    <img src="${pageContext.request.contextPath}/images/profile.jpg" alt="Profile" class="profile-img">
+    <img src="${pageContext.request.contextPath}/assets/images/upload_area.png" alt="Profile" class="profile-img">
     <span class="dropdown-icon">▼</span>
 
     <div class="dropdown-menu">
-      <a href="${pageContext.request.contextPath}/profile"><div class="dropdown-item">My Profile</div></a>
-      <a href="${pageContext.request.contextPath}/appointments"><div class="dropdown-item active">My Appointments</div></a>
+      <a href="${pageContext.request.contextPath}/client/my-profile"><div class="dropdown-item">My Profile</div></a>
+      <a href="${pageContext.request.contextPath}/client/my-appointments"><div class="dropdown-item active">My Appointments</div></a>
       <a href="${pageContext.request.contextPath}/logout"><div class="dropdown-item">Logout</div></a>
     </div>
   </div>
@@ -206,7 +211,7 @@
   <div class="appointment-list">
     <!-- Appointment 1 -->
     <div class="appointment-card">
-      <img src="${pageContext.request.contextPath}/images/lawyers/lawyer1.jpg" alt="Susasa Acharya" class="lawyer-img">
+      <img src="${pageContext.request.contextPath}/assets/images/susasa-acharaya.png" alt="Susasa Acharya" class="lawyer-img">
 
       <div class="appointment-details">
         <div class="lawyer-name">Susasa Acharya</div>
@@ -226,7 +231,7 @@
 
     <!-- Appointment 2 -->
     <div class="appointment-card">
-      <img src="${pageContext.request.contextPath}/images/lawyers/lawyer2.jpg" alt="Anish Basnet" class="lawyer-img">
+      <img src="${pageContext.request.contextPath}/assets/images/anish-basnet.png" alt="Anish Basnet" class="lawyer-img">
 
       <div class="appointment-details">
         <div class="lawyer-name">Anish Basnet</div>
@@ -243,7 +248,7 @@
 
     <!-- Appointment 3 -->
     <div class="appointment-card">
-      <img src="${pageContext.request.contextPath}/images/lawyers/lawyer3.jpg" alt="Yusha Shrestha" class="lawyer-img">
+      <img src="${pageContext.request.contextPath}/assets/images/yusha-shrestha.png" alt="Yusha Shrestha" class="lawyer-img">
 
       <div class="appointment-details">
         <div class="lawyer-name">Yusha Shrestha</div>
@@ -254,7 +259,13 @@
       </div>
 
       <div class="appointment-actions">
-        <div class="btn btn-completed">Completed</div>
+        <div class="btn btn-leave_review">Leave Review</div>
+      </div>
+
+      <div class="appointment-actions">
+        <div class="btn btn-completed">
+          <a href="${pageContext.request.contextPath}/client/reviews">Completed</a>
+        </div>
       </div>
     </div>
   </div>

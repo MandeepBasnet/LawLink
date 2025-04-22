@@ -30,6 +30,7 @@ public class AdminAddLawyerServlet extends HttpServlet {
         }
     }
 
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -85,5 +86,12 @@ public class AdminAddLawyerServlet extends HttpServlet {
             request.getRequestDispatcher("adminAddLawyers.jsp").forward(request, response);
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/views/admin/admin-add-lawyer.jsp").forward(request, response);
+    }
 }
+
 

@@ -1,334 +1,459 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - LawLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+    <title>Book Appointment - Law Link</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #556673;
+            --secondary-color: #3d4a56;
+            --text-color: #333;
+            --light-text: #fff;
+            --border-color: #ddd;
+            --highlight-color: #4dabf7;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--primary-color);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 30px 0;
+        }
+
+        /* Lawyer Profile */
+        .lawyer-profile {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .lawyer-image {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .lawyer-info {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-left: none;
+            width: 250px;
+        }
+
+        .lawyer-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .lawyer-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .lawyer-experience, .lawyer-fee {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        /* Appointment Form */
+        .appointment-form {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        /* Calendar */
+        .calendar-section {
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .calendar-month {
+            display: flex;
+            align-items: center;
+        }
+
+        .month-nav {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-size: 18px;
+            padding: 0 10px;
+        }
+
+        .calendar-grid {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .day:hover {
+            background-color: #e9ecef;
+        }
+
+        .day.selected {
+            background-color: var(--highlight-color);
+            color: white;
+        }
+
+        .day.today {
+            border: 2px solid var(--highlight-color);
+        }
+
+        /* Time Selection */
+        .time-selection {
+            margin-top: 20px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f3f5;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-slot:hover {
+            background-color: #e9ecef;
+        }
+
+        .time-slot.selected {
+            background-color: var(--highlight-color);
+            color: white;
+        }
+
+        .select-button {
+            display: block;
+            width: 150px;
+            margin: 20px auto 0;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .select-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Reviews */
+        .reviews-section {
+            margin-top: 40px;
+        }
+
+        .reviews-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .review-card {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .review-stars {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .review-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .review-body {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .reviewer {
+            display: flex;
+            align-items: center;
+        }
+
+        .reviewer-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .reviewer-info {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-<!-- Header -->
-<%@ include file="includes/header.jsp" %>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg px-5 py-3">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center text-white" href="#">
+            <img src=${pageContext.request.contextPath}/assets/images/logo.png  alt="LawLink Logo" height="30" class="me-2"/>
+            <span class="fw-bold">Law Link</span>
+        </a>
+        <div class="ms-auto">
+            <ul class="navbar-nav d-flex flex-row gap-4">
+                <li class="nav-item"><a class="nav-link text-white" href="${pageContext.request.contextPath}/home">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="${pageContext.request.contextPath}/appointment">Appointments</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="${pageContext.request.contextPath}/lawyers">Lawyers</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="${pageContext.request.contextPath}/about-us">About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="${pageContext.request.contextPath}/contact-us">Contact Us</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <!-- Main Content -->
-<main class="book-appointment-main-content">
+<div class="main-content">
     <div class="container">
-        <div class="book-appointment-container">
-            <!-- Lawyer Profile -->
-            <div class="book-appointment-lawyer-profile">
-                <c:choose>
-                    <c:when test="${not empty lawyer}">
-                        <img src="${pageContext.request.contextPath}/assets/images/lawyers/${lawyer.imageUrl}" alt="${lawyer.name}" class="book-appointment-lawyer-image" onerror="this.src='${pageContext.request.contextPath}/assets/images/placeholder.svg'">
-                        <div class="book-appointment-lawyer-info">
-                            <div class="book-appointment-lawyer-name">${lawyer.name}</div>
-                            <div class="book-appointment-lawyer-title">${lawyer.title}</div>
-                            <div class="book-appointment-lawyer-specialty">${lawyer.specialty}</div>
-                            <div class="book-appointment-lawyer-experience">Experience: ${lawyer.experience}</div>
-                            <div class="book-appointment-lawyer-fee">Booking fee: ${lawyer.fee}</div>
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <img src="${pageContext.request.contextPath}/assets/images/lawyers/zaina-rai.jpg" alt="Zaina Rai" class="book-appointment-lawyer-image" onerror="this.src='${pageContext.request.contextPath}/assets/images/placeholder.svg'">
-                        <div class="book-appointment-lawyer-info">
-                            <div class="book-appointment-lawyer-name">Zaina Rai</div>
-                            <div class="book-appointment-lawyer-title">Principal senior advisor</div>
-                            <div class="book-appointment-lawyer-specialty">Criminal Law</div>
-                            <div class="book-appointment-lawyer-experience">Experience: 5 Years</div>
-                            <div class="book-appointment-lawyer-fee">Booking fee: 120$</div>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
-            <!-- Appointment Form -->
-            <div class="book-appointment-form">
-                <form id="appointmentForm" action="${pageContext.request.contextPath}/book-appointment" method="post">
-                    <input type="hidden" name="lawyerId" value="${lawyer.id != null ? lawyer.id : '1'}">
-
-                    <label for="name" class="book-appointment-form-label">Appointment for:</label>
-                    <input type="text" id="name" name="clientName" class="book-appointment-form-input" placeholder="Add your name" required>
-
-                    <input type="tel" id="phone" name="clientPhone" class="book-appointment-form-input" placeholder="Add your phone number" required>
-
-                    <input type="hidden" id="selectedDate" name="appointmentDate" value="">
-                    <input type="hidden" id="selectedTime" name="appointmentTime" value="">
-                </form>
-            </div>
-
-            <!-- Appointment Calendar -->
-            <div class="book-appointment-calendar">
-                <div class="book-appointment-calendar-header">
-                    <div class="book-appointment-calendar-title">Select appointment date:</div>
-                    <div class="book-appointment-month-selector">
-                        <button class="month-nav" id="prev-month">&lt;</button>
-                        <div class="month-name">
-                            <c:set var="now" value="<%=new java.util.Date()%>" />
-                            <fmt:formatDate value="${now}" pattern="MMMM yyyy" />
-                        </div>
-                        <button class="month-nav" id="next-month">&gt;</button>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Lawyer Profile -->
+                <div class="lawyer-profile">
+                    <img src="${pageContext.request.contextPath}/images/lawyer-zaina.jpg" alt="Zaina Rai" class="lawyer-image">
+                    <div class="lawyer-info">
+                        <h2 class="lawyer-name">Zaina Rai</h2>
+                        <p class="lawyer-title">Principal senior adviser</p>
+                        <p class="lawyer-experience">Experience: 5+ Years</p>
+                        <p class="lawyer-fee">Booking fee: 120$</p>
                     </div>
                 </div>
 
-                <table class="book-appointment-calendar" id="appointment-calendar">
-                    <thead>
-                    <tr>
-                        <th>SUN</th>
-                        <th>MON</th>
-                        <th>TUE</th>
-                        <th>WED</th>
-                        <th>THU</th>
-                        <th>FRI</th>
-                        <th>SAT</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Calendar days will be generated by JavaScript -->
-                    </tbody>
-                </table>
+                <!-- Appointment Form -->
+                <div class="appointment-form">
+                    <label class="form-label">Appointment for:</label>
+                    <input type="text" class="form-control" placeholder="Add your name">
+                    <input type="text" class="form-control" placeholder="Add your phone number">
+                </div>
 
-                <button type="button" class="book-appointment-btn" id="select-date-btn">select date</button>
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3 class="reviews-title">Latest reviews</h3>
+                    <div class="reviews-container">
+                        <div class="review-card">
+                            <div class="review-stars">
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <h4 class="review-title">Review title</h4>
+                            <p class="review-body">Review body</p>
+                            <div class="reviewer">
+                                <img src="lawyer1.png" alt="Reviewer" class="reviewer-avatar">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-name">Reviewer name</div>
+                                    <div class="reviewer-date">Date</div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="book-appointment-time-slots">
-                    <div class="book-appointment-time-slots-title">Select appointment time:</div>
-                    <div class="book-appointment-time-slots-grid">
-                        <c:forEach var="timeSlot" items="${availableTimeSlots}">
-                            <div class="book-appointment-time-slot" data-time="${timeSlot}">${timeSlot}</div>
-                        </c:forEach>
-
-                        <!-- Fallback if availableTimeSlots attribute is not set -->
-                        <c:if test="${empty availableTimeSlots}">
-                            <div class="book-appointment-time-slot">10 AM</div>
-                            <div class="book-appointment-time-slot">11 AM</div>
-                            <div class="book-appointment-time-slot">12 PM</div>
-                            <div class="book-appointment-time-slot">1 PM</div>
-                            <div class="book-appointment-time-slot">2 PM</div>
-                            <div class="book-appointment-time-slot">3 PM</div>
-                            <div class="book-appointment-time-slot">4 PM</div>
-                            <div class="book-appointment-time-slot">5 PM</div>
-                        </c:if>
+                        <div class="review-card">
+                            <div class="review-stars">
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <h4 class="review-title">Review title</h4>
+                            <p class="review-body">Review body</p>
+                            <div class="reviewer">
+                                <img src="${pageContext.request.contextPath}/images/avatar2.jpg" alt="Reviewer" class="reviewer-avatar">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-name">Reviewer name</div>
+                                    <div class="reviewer-date">Date</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <button type="button" class="book-appointment-btn" id="select-time-btn">Select time</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Reviews Section -->
-        <div class="book-appointment-reviews-section">
-            <h2 class="book-appointment-reviews-title">Latest reviews</h2>
-            <div class="book-appointment-reviews-container">
-                <c:forEach var="review" items="${lawyerReviews}">
-                    <div class="book-appointment-review-card">
-                        <div class="book-appointment-review-stars">
-                            <c:forEach begin="1" end="${review.rating}">★</c:forEach>
-                        </div>
-                        <div class="book-appointment-review-title">${review.title}</div>
-                        <div class="book-appointment-review-body">${review.content}</div>
-                        <div class="book-appointment-reviewer">
-                            <img src="${pageContext.request.contextPath}/assets/images/clients/${review.clientImage}" alt="${review.clientName}" class="book-appointment-reviewer-image" onerror="this.src='${pageContext.request.contextPath}/assets/images/placeholder.svg'">
-                            <div class="book-appointment-reviewer-info">
-                                <div class="book-appointment-reviewer-name">${review.clientName}</div>
-                                <div class="book-appointment-review-date">${review.date}</div>
-                            </div>
-                        </div>
-                    </div>
-                </c:forEach>
-
-                <!-- Fallback if lawyerReviews attribute is not set -->
-                <c:if test="${empty lawyerReviews}">
-                    <div class="book-appointment-review-card">
-                        <div class="book-appointment-review-stars">★★★★★</div>
-                        <div class="book-appointment-review-title">Review title</div>
-                        <div class="book-appointment-review-body">Review body</div>
-                        <div class="book-appointment-reviewer">
-                            <img src="${pageContext.request.contextPath}/assets/images/placeholder.svg" alt="Reviewer" class="book-appointment-reviewer-image">
-                            <div class="book-appointment-reviewer-info">
-                                <div class="book-appointment-reviewer-name">Reviewer name</div>
-                                <div class="book-appointment-review-date">Date</div>
-                            </div>
+            <div class="col-md-6">
+                <!-- Calendar Section -->
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <h3 class="calendar-title">Select appointment date:</h3>
+                        <div class="calendar-month">
+                            <span class="month-nav"><i class="fas fa-chevron-left"></i></span>
+                            <span>June 2024</span>
+                            <span class="month-nav"><i class="fas fa-chevron-right"></i></span>
                         </div>
                     </div>
 
-                    <div class="book-appointment-review-card">
-                        <div class="book-appointment-review-stars">★★★★★</div>
-                        <div class="book-appointment-review-title">Review title</div>
-                        <div class="book-appointment-review-body">Review body</div>
-                        <div class="book-appointment-reviewer">
-                            <img src="${pageContext.request.contextPath}/assets/images/placeholder.svg" alt="Reviewer" class="reviewer-image">
-                            <div class="book-appointment-reviewer-info">
-                                <div class="book-appointment-reviewer-name">Reviewer name</div>
-                                <div class="book-appointment-review-date">Date</div>
-                            </div>
+                    <div class="calendar-grid">
+                        <div class="weekdays">
+                            <div>SUN</div>
+                            <div>MON</div>
+                            <div>TUE</div>
+                            <div>WED</div>
+                            <div>THU</div>
+                            <div>FRI</div>
+                            <div>SAT</div>
+                        </div>
+
+                        <div class="days">
+                            <%
+                                // This would normally be calculated dynamically
+                                String[] days = {"", "", "2", "3", "4", "5", "6", "7", "8",
+                                        "9", "10", "11", "12", "13", "14", "15",
+                                        "16", "17", "18", "19", "20", "21", "22",
+                                        "23", "24", "25", "26", "27", "28", "29", "30", "", ""};
+
+                                for(String day : days) {
+                                    if(day.equals("")) {
+                            %>
+                            <div></div>
+                            <% } else if(day.equals("26")) { %>
+                            <div class="day selected"><%= day %></div>
+                            <% } else if(day.equals("10")) { %>
+                            <div class="day" style="color: var(--highlight-color);"><%= day %></div>
+                            <% } else { %>
+                            <div class="day"><%= day %></div>
+                            <% } } %>
                         </div>
                     </div>
-                </c:if>
+
+                    <button class="select-button">select date</button>
+
+                    <!-- Time Selection -->
+                    <div class="time-selection">
+                        <h3 class="calendar-title">Select appointment time:</h3>
+                        <div class="time-slots">
+                            <div class="time-slot">10 AM</div>
+                            <div class="time-slot">11 AM</div>
+                            <div class="time-slot">12 PM</div>
+                            <div class="time-slot">1 PM</div>
+                            <div class="time-slot">2 PM</div>
+                            <div class="time-slot">3 PM</div>
+                            <div class="time-slot">4 PM</div>
+                            <div class="time-slot">5 PM</div>
+                        </div>
+                    </div>
+
+                    <button class="select-button mt-4">Book Now</button>
+                </div>
             </div>
         </div>
     </div>
-</main>
+</div>
 
-<!-- Footer -->
-<%@ include file="includes/footer.jsp" %>
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Custom JavaScript for interactive elements -->
 <script>
-    // Generate calendar
-    function generateCalendar(year, month) {
-        const calendarBody = document.querySelector('#appointment-calendar tbody');
-        calendarBody.innerHTML = '';
-
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-
-        let dayCounter = 1;
-        let rowCount = 0;
-
-        // Create rows for the calendar
-        while (dayCounter <= daysInMonth) {
-            const row = document.createElement('tr');
-
-            // Create cells for each day of the week
-            for (let i = 0; i < 7; i++) {
-                const cell = document.createElement('td');
-
-                // Skip days before the first day of the month in the first row
-                if (rowCount === 0 && i < firstDay.getDay()) {
-                    cell.textContent = '';
-                }
-                // Add days of the month
-                else if (dayCounter <= daysInMonth) {
-                    cell.textContent = dayCounter;
-
-                    // Check if the day is in the past
-                    const currentDate = new Date();
-                    const cellDate = new Date(year, month, dayCounter);
-
-                    if (cellDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())) {
-                        cell.classList.add('disabled');
-                    } else {
-                        cell.addEventListener('click', function() {
-                            if (!this.classList.contains('disabled')) {
-                                const allDays = document.querySelectorAll('#appointment-calendar td');
-                                allDays.forEach(day => day.classList.remove('selected'));
-                                this.classList.add('selected');
-
-                                // Update hidden input
-                                const selectedDate = new Date(year, month, parseInt(this.textContent));
-                                document.getElementById('selectedDate').value = selectedDate.toISOString().split('T')[0];
-                            }
-                        });
-                    }
-
-                    dayCounter++;
-                }
-
-                row.appendChild(cell);
-            }
-
-            calendarBody.appendChild(row);
-            rowCount++;
-        }
-    }
-
-    // Initialize calendar
-    const currentDate = new Date();
-    let currentYear = currentDate.getFullYear();
-    let currentMonth = currentDate.getMonth();
-
-    generateCalendar(currentYear, currentMonth);
-
-    // Update month name
-    function updateMonthName() {
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        document.querySelector('.month-name').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-    }
-
-    updateMonthName();
-
-    // Month navigation
-    document.getElementById('prev-month').addEventListener('click', function() {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-        updateMonthName();
-        generateCalendar(currentYear, currentMonth);
-    });
-
-    document.getElementById('next-month').addEventListener('click', function() {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        updateMonthName();
-        generateCalendar(currentYear, currentMonth);
-    });
-
-    // Time slot selection
-    const timeSlots = document.querySelectorAll('.time-slot');
-    timeSlots.forEach(slot => {
-        slot.addEventListener('click', function() {
-            if (!this.classList.contains('disabled')) {
-                timeSlots.forEach(s => s.classList.remove('selected'));
+    document.addEventListener('DOMContentLoaded', function() {
+        // Day selection
+        const days = document.querySelectorAll('.day');
+        days.forEach(day => {
+            day.addEventListener('click', function() {
+                // Remove selected class from all days
+                days.forEach(d => d.classList.remove('selected'));
+                // Add selected class to clicked day
                 this.classList.add('selected');
-
-                // Update hidden input
-                document.getElementById('selectedTime').value = this.textContent.trim();
-            }
+            });
         });
-    });
 
-    // Form submission
-    document.getElementById('select-date-btn').addEventListener('click', function() {
-        const selectedDay = document.querySelector('#appointment-calendar td.selected');
-        if (selectedDay) {
-            alert(`Date selected: ${selectedDay.textContent} ${document.querySelector('.month-name').textContent}`);
-
-            // In a real application, you might want to fetch available time slots for the selected date
-            // For example:
-            // fetch(`${pageContext.request.contextPath}/api/time-slots?date=${document.getElementById('selectedDate').value}&lawyerId=${document.querySelector('input[name="lawyerId"]').value}`)
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         // Update available time slots
-            //     });
-        } else {
-            alert('Please select a date');
-        }
-    });
-
-    document.getElementById('select-time-btn').addEventListener('click', function() {
-        const selectedTime = document.querySelector('.time-slot.selected');
-        const nameInput = document.getElementById('name');
-        const phoneInput = document.getElementById('phone');
-        const selectedDay = document.querySelector('#appointment-calendar td.selected');
-
-        if (!nameInput.value.trim()) {
-            alert('Please enter your name');
-            return;
-        }
-
-        if (!phoneInput.value.trim()) {
-            alert('Please enter your phone number');
-            return;
-        }
-
-        if (!selectedDay) {
-            alert('Please select a date');
-            return;
-        }
-
-        if (selectedTime) {
-            // Submit the form
-            document.getElementById('appointmentForm').submit();
-        } else {
-            alert('Please select a time slot');
-        }
+        // Time slot selection
+        const timeSlots = document.querySelectorAll('.time-slot');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                // Remove selected class from all time slots
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                // Add selected class to clicked time slot
+                this.classList.add('selected');
+            });
+        });
     });
 </script>
 </body>

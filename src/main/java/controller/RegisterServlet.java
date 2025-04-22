@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
+
 /**
  * Servlet to handle user registration
  */
@@ -21,7 +22,6 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 
@@ -29,14 +29,22 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = ValidationUtil.sanitizeInput(request.getParameter("username"));
+        String username = ValidationUtil.sanitizeInput(request.getParameter("userName")); // ✅ corrected
         String email = ValidationUtil.sanitizeInput(request.getParameter("email"));
         String fullName = ValidationUtil.sanitizeInput(request.getParameter("fullName"));
         String password = request.getParameter("password");
+        String confirmPassword = request.getParameter("confirmPassword");
 
         if (ValidationUtil.isEmpty(username) || ValidationUtil.isEmpty(email) ||
-                ValidationUtil.isEmpty(fullName) || ValidationUtil.isEmpty(password)) {
+                ValidationUtil.isEmpty(fullName) || ValidationUtil.isEmpty(password) ||
+                ValidationUtil.isEmpty(confirmPassword)) {
             request.setAttribute("error", "All fields are required.");
+            request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) { // ✅ check if password matches
+            request.setAttribute("error", "Passwords do not match.");
             request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
             return;
         }
@@ -54,8 +62,8 @@ public class RegisterServlet extends HttpServlet {
             boolean success = userDAO.registerUser(newUser);
 
             if (success) {
-                request.setAttribute("success", "Registration successful! Please login.");
-                response.sendRedirect(request.getContextPath() + "/log-in");
+                // ✅ Redirect to Home after successful registration
+                response.sendRedirect(request.getContextPath() + "/home");
             } else {
                 request.setAttribute("error", "Registration failed. Try again.");
                 request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
