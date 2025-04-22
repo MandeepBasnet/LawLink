@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="model.User" %>
+<%@ page session="true" %>
+
+<%
+    User loggedInUser = (User) session.getAttribute("user");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -329,6 +335,51 @@
             margin-right: 10px;
         }
 
+        .profile {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .profile-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            color: black;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 99;
+        }
+
+        .profile-menu a, .profile-menu form button {
+            padding: 10px;
+            text-align: left;
+            text-decoration: none;
+            display: block;
+            background: none;
+            border: none;
+            color: black;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .profile-menu a:hover, .profile-menu form button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .profile:hover .profile-menu {
+            display: block;
+        }
+
         /* Media Queries for Responsiveness */
         @media (max-width: 768px) {
             header {
@@ -405,10 +456,27 @@
     </div>
     <nav>
         <ul>
-            <c:set var="menuItems" value="${['Home', 'Appointment', 'Lawyers', 'About Us', 'Contact Us', 'Log In']}" />
-            <c:forEach var="item" items="${menuItems}">
-                <li><a href="${pageContext.request.contextPath}/${item.toLowerCase().replace(' ', '-')}">${item}</a></li>
-            </c:forEach>
+            <li><a href="${pageContext.request.contextPath}/home">Home</a></li>
+            <li><a href="${pageContext.request.contextPath}/appointment">Appointment</a></li>
+            <li><a href="${pageContext.request.contextPath}/lawyers">Lawyers</a></li>
+            <li><a href="${pageContext.request.contextPath}/about-us">About Us</a></li>
+            <li><a href="${pageContext.request.contextPath}/contact-us">Contact Us</a></li>
+            <% if (loggedInUser == null) { %>
+            <li><a href="${pageContext.request.contextPath}/log-in">Log In</a></li>
+            <% } else { %>
+            <li>
+                <div class="profile">
+                    <img src="${pageContext.request.contextPath}/assets/images/<%= loggedInUser.getProfileImage() != null ? loggedInUser.getProfileImage() : "profile_pic.png" %>" alt="Profile">
+                    <div class="profile-menu">
+                        <a href="${pageContext.request.contextPath}/client/my-appointments">My Appointments</a>
+                        <a href="${pageContext.request.contextPath}/client/my-profile">My Profile</a>
+                        <form action="${pageContext.request.contextPath}/logout" method="post" style="margin:0;">
+                            <button type="submit">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            <% } %>
         </ul>
     </nav>
 </header>
