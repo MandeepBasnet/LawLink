@@ -3,11 +3,9 @@ package dao;
 import model.User;
 import util.DBConnectionUtil;
 import util.PasswordUtil;
-import util.EmailUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
