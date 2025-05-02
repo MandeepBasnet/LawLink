@@ -8,44 +8,12 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/adminStyle.css">
 </head>
 <body>
-<div class="header">
-    <div class="logo-container">
-        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo">
-        <span class="logo-text">LawLink</span>
-    </div>
-    <div class="user-info">
-        <img src="${pageContext.request.contextPath}/assets/images/profile_pic.png" alt="Admin" class="user-avatar">
-        <span>John Doe</span>
-        <span>Admin</span>
-        <form action="${pageContext.request.contextPath}/logout" method="post" style="display: inline;">
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
-    </div>
-</div>
+<jsp:include page="common/header.jsp" />
 
 <div class="main-container">
-    <div class="sidebar">
-        <a href="${pageContext.request.contextPath}/admin/admin-dashboard" class="sidebar-item ">
-            <img src="${pageContext.request.contextPath}/assets/images/home_icon.svg" alt="Dashboard">
-            Dashboard
-        </a>
-        <a href="${pageContext.request.contextPath}/admin/admin-clients" class="sidebar-item ">
-            <img src="${pageContext.request.contextPath}/assets/images/client_icon.svg" alt="Clients">
-            Clients
-        </a>
-        <a href="${pageContext.request.contextPath}/admin/admin-lawyers" class="sidebar-item active">
-            <img src="${pageContext.request.contextPath}/assets/images/clients_icon.svg" alt="Lawyers">
-            Lawyers
-        </a>
-        <a href="${pageContext.request.contextPath}/admin/admin-add-lawyer" class="sidebar-item ">
-            <img src="${pageContext.request.contextPath}/assets/images/add_icon.svg" alt="Add Lawyer">
-            Add Lawyer
-        </a>
-        <a href="${pageContext.request.contextPath}/admin/admin-appointments" class="sidebar-item ">
-            <img src="${pageContext.request.contextPath}/assets/images/appointment_icon.svg" alt="Appointments">
-            Appointments
-        </a>
-    </div>
+    <jsp:include page="common/sidebar.jsp">
+        <jsp:param name="activePage" value="lawyers" />
+    </jsp:include>
 
     <div class="main-content">
         <div class="dashboard-stats">
