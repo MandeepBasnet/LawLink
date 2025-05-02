@@ -1,0 +1,235 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f8f8f8;
+}
+
+/* Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #7f8c9a;
+    padding: 15px 50px;
+    color: white;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.profile {
+    position: relative;
+    display: inline-block;
+}
+
+.profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.profile-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    color: black;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    z-index: 99;
+}
+
+.profile-menu a, .profile-menu form button {
+    padding: 10px;
+    text-align: left;
+    text-decoration: none;
+    display: block;
+    background: none;
+    border: none;
+    color: black;
+    width: 100%;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-menu a:hover, .profile-menu form button:hover {
+    background-color: #f1f1f1;
+}
+
+.profile:hover .profile-menu {
+    display: block;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+/* Appointments */
+.appointment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.appointment-card {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+.lawyer-img {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.appointment-details {
+    flex: 1;
+}
+
+.lawyer-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.lawyer-specialty {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.appointment-info {
+    margin-bottom: 5px;
+}
+
+.appointment-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-cancel {
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+.btn-cancelled {
+    background-color: #e07a7a;
+    color: white;
+}
+
+.btn-completed {
+    background-color: #a3e07a;
+    color: black;
+}
+
+.btn-leave_review {
+    background-color: #3a444a;
+    color: black;
+}
+
+/* Profile */
+.user-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.info-container {
+    display: flex;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 40px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.info-column {
+    flex: 1;
+    padding: 20px;
+}
+
+.info-column:first-child {
+    border-right: 1px solid #e0e0e0;
+}
+
+.info-heading {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.info-item {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.info-label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-edit {
+    background-color: #b8b8b8;
+}
+
+.btn-save {
+    background-color: #a3e07a;
+}
+
+.btn-password {
+    background-color: #b8b8b8;
+}
