@@ -24,12 +24,12 @@
   </div>
 
   <div class="profile">
-    <img src="${pageContext.request.contextPath}/assets/images/profile_pic.png" alt="John Thapa" class="profile-pic">
+    <img src="${pageContext.request.contextPath}/assets/images/profile_pic.png" alt="Profile" class="profile-pic">
     <div class="profile-menu">
       <a href="${pageContext.request.contextPath}/client/my-appointments">My Appointments</a>
       <a href="${pageContext.request.contextPath}/client/my-profile">My Profile</a>
       <form action="${pageContext.request.contextPath}/logout" method="post" style="margin:0;">
-        <button type="submit">Logout</button>
+        <button type="submit" class="menu-logout-btn">Logout</button>
       </form>
     </div>
   </div>
@@ -103,3 +103,6 @@
 </div>
 </body>
 </html>
+<script>
+  // No JavaScript needed for hover-based dropdown
+</script>
