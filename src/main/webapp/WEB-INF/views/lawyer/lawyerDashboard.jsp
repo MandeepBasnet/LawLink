@@ -60,7 +60,7 @@
         <div class="reviews-section">
             <div class="section-header">
                 <h2 class="section-title">Recent Reviews</h2>
-                <a href="${pageContext.request.contextPath}/all-reviews" class="btn-link">See All</a>
+                <a href="${pageContext.request.contextPath}/lawyer/all-reviews" class="btn-link">See All</a>
             </div>
             <div class="review-list">
                 <div class="review-card">
