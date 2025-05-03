@@ -26,9 +26,12 @@
                 <p class="lawyer-title">${lawyer.title}</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> ${lawyer.location}</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> ${lawyer.phoneLabel}: ${lawyer.phone}</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment?id=${lawyer.id}" class="book-button">
-                    Book ${lawyer.gender == 'female' ? 'her' : 'him'} now!
-                </a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="${lawyer.id}">
+                    <button type="submit" class="book-button">
+                        Book ${lawyer.gender == 'female' ? 'her' : 'him'} now!
+                    </button>
+                </form>
             </div>
         </div>
     </c:forEach>
@@ -45,7 +48,10 @@
                 <p class="lawyer-title">Principal senior advisor</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Itahari</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Phone NO: +977-9086706541</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book her now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="1">
+                    <button type="submit" class="book-button">Book her now!</button>
+                </form>
             </div>
         </div>
 
@@ -59,7 +65,10 @@
                 <p class="lawyer-title">Manager partner</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Itahari</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Phone NO: +977-9705523049</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="2">
+                    <button type="submit" class="book-button">Book him now!</button>
+                </form>
             </div>
         </div>
 
@@ -73,7 +82,10 @@
                 <p class="lawyer-title">Legal Associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Kathmandu</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9812395010</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="3">
+                    <button type="submit" class="book-button">Book him now!</button>
+                </form>
             </div>
         </div>
 
@@ -87,7 +99,10 @@
                 <p class="lawyer-title">Founding partner</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Itahari</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Phone NO: +977-9867063791</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="4">
+                    <button type="submit" class="book-button">Book him now!</button>
+                </form>
             </div>
         </div>
 
@@ -101,7 +116,10 @@
                 <p class="lawyer-title">Principal senior advisor</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Biratnagar</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9706146926</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book her now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="5">
+                    <button type="submit" class="book-button">Book her now!</button>
+                </form>
             </div>
         </div>
 
@@ -115,7 +133,10 @@
                 <p class="lawyer-title">Advocate & Legal Advisor</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Morang</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact No: +977-9823543129</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="6">
+                    <button type="submit" class="book-button">Book him now!</button>
+                </form>
             </div>
         </div>
 
@@ -129,7 +150,10 @@
                 <p class="lawyer-title">Junior associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Tarahara</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9703304911</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book her now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="7">
+                    <button type="submit" class="book-button">Book her now!</button>
+                </form>
             </div>
         </div>
 
@@ -143,7 +167,10 @@
                 <p class="lawyer-title">Legal Associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Jhapa</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9708203041</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="8">
+                    <button type="submit" class="book-button">Book him now!</button>
+                </form>
             </div>
         </div>
 
@@ -157,7 +184,10 @@
                 <p class="lawyer-title">Legal Associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Biratnagar</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9703129941</p>
-                <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book her now!</a>
+                <form action="${pageContext.request.contextPath}/client/book-appointment-page" method="get" style="margin:0;">
+                    <input type="hidden" name="lawyerId" value="9">
+                    <button type="submit" class="book-button">Book her now!</button>
+                </form>
             </div>
         </div>
     </c:if>
