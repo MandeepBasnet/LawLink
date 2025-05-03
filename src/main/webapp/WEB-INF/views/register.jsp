@@ -8,41 +8,48 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
-<div class="container">
-    <div class="image-container">
-        <img src="${pageContext.request.contextPath}/assets/images/lady%20justice.jpg" alt="Lady Justice statue">
-    </div>
-    <div class="form-container">
-        <div class="form-content">
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="image-container">
+            <img src="${pageContext.request.contextPath}/assets/images/lady%20justice.jpg" alt="Lady Justice statue">
+        </div>
+        <div class="form-container">
+            <a href="${pageContext.request.contextPath}/home" class="back-link">
+                <span class="back-arrow">◀</span> Back to Website
+            </a>
             <h1>SIGN UP</h1>
             <p class="subtitle">Enter your Personal details to create your account</p>
-
             <form action="${pageContext.request.contextPath}/register" method="post">
                 <div class="form-group">
-                    <input type="text" name="fullName" placeholder="Full Name" required>
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" name="userName" placeholder="User Name" required>
+                    <label for="userName">User Name</label>
+                    <input type="text" id="userName" name="userName" required>
                 </div>
                 <div class="form-group">
-                    <input type="email" name="email" placeholder="Email Address" required>
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" name="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" name="profilePicture" placeholder="Profile Picture">
+                    <label for="profilePicture">Profile Picture</label>
+                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
                 </div>
-                <button type="submit">Create Account</button>
+                <button type="submit" class="login-btn">SIGN UP</button>
             </form>
-
             <div class="login-section">
                 <span class="login-text">Already Have An Account?</span>
                 <a href="${pageContext.request.contextPath}/log-in">
-                    <button type="button" class="login-btn">LOG IN</button>
+                    <button type="button" class="signup-btn">LOG IN</button>
                 </a>
             </div>
         </div>

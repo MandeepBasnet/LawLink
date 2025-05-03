@@ -5,7 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Lawyers - LawLink</title>
+    <title>Book Appointment - LawLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
@@ -37,10 +38,10 @@
         <!-- Lawyer 1 -->
         <div class="lawyer-card">
             <div class="lawyer-image">
-                <img src="${pageContext.request.contextPath}/assets/images/zaina-rai.png" alt="Zaina Raj" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
+                <img src="${pageContext.request.contextPath}/assets/images/zaina-rai.png" alt="Zaina Rai" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="lawyer-info">
-                <h2 class="lawyer-name">Zaina Raj</h2>
+                <h2 class="lawyer-name">Zaina Rai</h2>
                 <p class="lawyer-title">Principal senior advisor</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Itahari</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Phone NO: +977-9086706541</p>
@@ -65,11 +66,11 @@
         <!-- Lawyer 3 -->
         <div class="lawyer-card">
             <div class="lawyer-image">
-                <img src="${pageContext.request.contextPath}/assets/images/manish-khanal.png" alt="MANISH KHANAL" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
+                <img src="${pageContext.request.contextPath}/assets/images/manish-khanal.png" alt="Manish Khanal" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="lawyer-info">
-                <h2 class="lawyer-name">MANISH KHANAL</h2>
-                <p class="lawyer-title">LEGAL ASSOCIATE</p>
+                <h2 class="lawyer-name">Manish Khanal</h2>
+                <p class="lawyer-title">Legal Associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Kathmandu</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9812395010</p>
                 <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
@@ -111,7 +112,7 @@
             </div>
             <div class="lawyer-info">
                 <h2 class="lawyer-name">Ashutosh Srivastava</h2>
-                <p class="lawyer-title">ADVOCATE & LEGAL ADVISOR</p>
+                <p class="lawyer-title">Advocate & Legal Advisor</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Morang</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact No: +977-9823543129</p>
                 <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book him now!</a>
@@ -149,11 +150,11 @@
         <!-- Lawyer 9 -->
         <div class="lawyer-card">
             <div class="lawyer-image">
-                <img src="${pageContext.request.contextPath}/assets/images/susasa-acharaya.png" alt="SUSASA ACHARYA" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
+                <img src="${pageContext.request.contextPath}/assets/images/susasa-acharaya.png" alt="Susasa Acharya" onerror="this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png'">
             </div>
             <div class="lawyer-info">
-                <h2 class="lawyer-name">SUSASA ACHARYA</h2>
-                <p class="lawyer-title">LEGAL ASSOCIATE</p>
+                <h2 class="lawyer-name">Susasa Acharya</h2>
+                <p class="lawyer-title">Legal Associate</p>
                 <p class="lawyer-location"><i class="fas fa-map-marker-alt"></i> Biratnagar</p>
                 <p class="lawyer-phone"><i class="fas fa-phone"></i> Contact NO: +977-9703129941</p>
                 <a href="${pageContext.request.contextPath}/client/book-appointment" class="book-button">Book her now!</a>

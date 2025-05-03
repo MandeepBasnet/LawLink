@@ -19,20 +19,20 @@ a {
 
 /* Header styles */
 header {
-  background-color: #3a4a5c; /* Dark blue background */
+  background-color: #3a4a5c;
   color: white;
   padding: 15px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px; /* Add padding to the left and right */
+  padding: 0 20px;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-between; /* Distribute items evenly */
+  justify-content: space-between;
 }
 
 .logo-container {
@@ -74,11 +74,164 @@ nav a:hover {
   padding: 0 20px;
 }
 
+/* Login and Signup Page Styles */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  min-height: 100vh; /* Restored to ensure full height context */
+  margin-top: 50px; /* Added margin to push content down */
+}
+
+.login-container {
+  display: flex;
+  background-color: #556673;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 100%;
+}
+
+.image-container {
+  flex: 1;
+  max-width: 50%;
+  background-color: #e0e0e0; /* Added light gray background for register.jsp image */
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.form-container {
+  flex: 1;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #556673;
+  color: #fff;
+}
+
+.form-container h1 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.back-link {
+  display: block;
+  text-align: left;
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.back-arrow {
+  margin-right: 5px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #3a4a5c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background-color: #2d3846;
+}
+
+.signup-btn {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.signup-btn:hover {
+  background-color: #3a4a5c;
+}
+
+.forgot-password, .login-section a {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.forgot-password:hover, .login-section a:hover {
+  text-decoration: underline;
+}
+
+.signup-section, .login-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.signup-section span, .login-section .login-text {
+  color: #fff;
+  margin-right: 10px;
+}
+
 /* Hero Section */
 .hero {
-  background-color: #d1d5db; /* Light grey background */
+  background-color: #d1d5db;
   padding: 60px 0;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.hero-content {
+  max-width: 50%;
+  text-align: left;
 }
 
 .hero h1 {
@@ -89,8 +242,91 @@ nav a:hover {
 
 .hero p {
   font-size: 1.2rem;
-  max-width: 800px;
-  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+.cta-button {
+  background-color: #556673;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.cta-button:hover {
+  background-color: #3a4a5c;
+}
+
+.phone-number {
+  font-size: 1rem;
+  color: #333;
+}
+
+.phone-number i {
+  margin-right: 5px;
+}
+
+.hero-image {
+  position: relative;
+  max-width: 40%;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 300px;
+  height: 100%;
+  border: 5px solid #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.experience-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #e5e7eb;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.search-section {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  width: 60%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.search-dropdown {
+  width: 30%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.search-button {
+  width: 10%;
+  padding: 10px;
+  background-color: #556673;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #3a4a5c;
 }
 
 /* What We Do Section */
@@ -179,7 +415,7 @@ nav a:hover {
   height: auto;
 }
 
-/* Testimonials Section */
+/* Testimonials Section (for about-us.jsp) */
 .testimonials {
   display: flex;
   justify-content: space-between;
@@ -233,10 +469,291 @@ nav a:hover {
   font-size: 0.95rem;
 }
 
+/* Testimonials Section (for home.jsp) */
+.testimonials-section {
+  padding: 60px 0;
+  text-align: center;
+  background-color: #f9fafb;
+}
+
+.testimonials-heading {
+  color: #1e3a8a;
+  font-size: 2rem;
+  margin-bottom: 40px;
+}
+
+.testimonial-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.testimonial-image img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.testimonial-content h3 {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.testimonial-content .position {
+  color: #556673;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.testimonial-content p {
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+/* Attorneys Section (for home.jsp) */
+.attorneys-section {
+  padding: 60px 0;
+  text-align: center;
+}
+
+.attorneys-heading h2 {
+  color: #1e3a8a;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.attorneys-description p {
+  font-size: 1.1rem;
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+
+.attorneys-cta .book-appointment-btn {
+  background-color: #556673;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.attorneys-cta .book-appointment-btn:hover {
+  background-color: #3a4a5c;
+}
+
+.attorney-profiles {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.attorney-card {
+  width: calc(33.333% - 20px);
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.attorney-card img {
+  width: 100%;
+  height: auto;
+}
+
+.attorney-info {
+  padding: 10px;
+}
+
+.attorney-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.attorney-info p {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.book-button {
+  background-color: #556673;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.book-button:hover {
+  background-color: #3a4a5c;
+}
+
+/* Lawyers Container (for appointment.jsp) */
+.lawyers-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lawyer-card {
+  display: flex;
+  width: calc(33.333% - 20px);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.lawyer-image {
+  flex: 0 0 40%;
+}
+
+.lawyer-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lawyer-info {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.lawyer-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.lawyer-title {
+  font-size: 0.9rem;
+  color: #556673;
+  margin-bottom: 5px;
+}
+
+.lawyer-location, .lawyer-phone {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.lawyer-location i, .lawyer-phone i {
+  margin-right: 5px;
+}
+
+.book-button {
+  background-color: #556673;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.book-button:hover {
+  background-color: #3a4a5c;
+}
+
+/* Team Members Container (for lawyers.jsp) */
+.team-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-member {
+  width: calc(33.333% - 20px);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.team-member img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.member-info {
+  padding: 15px;
+}
+
+.member-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.member-title {
+  font-size: 0.9rem;
+  color: #556673;
+  margin-bottom: 10px;
+}
+
+.member-contact {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.member-contact p {
+  margin-bottom: 5px;
+}
+
+.member-bio {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.member-bio p {
+  margin-bottom: 5px;
+}
+
+.read-more {
+  color: #556673;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+
 /* Footer */
 footer {
-  background-color: #556673; /* Corrected background color */
-  color: white; /* Corrected font color */
+  background-color: #556673;
+  color: white;
   padding: 40px 0;
 }
 
@@ -277,52 +794,7 @@ footer {
   vertical-align: middle;
 }
 
-/* Lawyer Card Styles */
-.lawyer-card {
-  width: calc(33.333% - 40px); /* 3 lawyers per row with 20px margin */
-  margin: 20px;
-  text-align: center;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.lawyer-image img {
-  width: 100%;
-  height: auto;
-}
-
-.lawyer-info {
-  padding: 10px;
-}
-
-.lawyer-name {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.lawyer-title {
-  font-size: 0.9rem;
-  color: #556673;
-}
-
-.lawyer-location, .lawyer-phone {
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.book-button {
-  background-color: #556673;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 5px;
-  display: inline-block;
-  margin-top: 10px;
-}
-
-/* Contact Us Styles */
+/* Contact Us Styles (for contact-us.jsp) */
 .contact-info {
   display: flex;
   justify-content: space-around;
@@ -351,93 +823,7 @@ footer {
   color: #333;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  nav ul {
-    gap: 15px;
-  }
-
-  .hero h1 {
-    font-size: 2rem;
-  }
-
-  .testimonials {
-    flex-direction: column;
-  }
-
-  .footer-content {
-    flex-direction: column;
-  }
-
-  .lawyer-card {
-    width: calc(50% - 20px); /* 2 lawyers per row on smaller screens */
-  }
-}
-
-/* Login and Signup Page Styles */
-.form-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.form-container h1 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.login-btn, .signup-btn {
-  width: 100%;
-  padding: 10px;
-  background-color: #556673;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.login-btn:hover, .signup-btn:hover {
-  background-color: #3a4a5c;
-}
-
-.forgot-password, .login-section a {
-  display: block;
-  text-align: center;
-  margin-top: 10px;
-  color: #556673;
-  text-decoration: none;
-}
-
-.forgot-password:hover, .login-section a:hover {
-  text-decoration: underline;
-}
-
-/* Appointment Page Styles */
+/* Appointment Page Styles (for book-appointment.jsp) */
 .appointment-form {
   max-width: 400px;
   margin: 20px auto;
@@ -475,18 +861,200 @@ footer {
   background-color: #3a4a5c;
 }
 
-.time-slot {
+/* Profile Menu (for header.jsp) */
+.profile {
+  position: relative;
+  display: inline-block;
+}
+
+.profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.profile-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 4px;
+}
+
+.profile:hover .profile-menu {
   display: block;
+}
+
+.profile-menu a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.profile-menu a:hover {
+  background-color: #f1f1f1;
+}
+
+.profile-menu form {
+  padding: 0;
+  margin: 0;
+}
+
+.profile-menu button {
   width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #333;
+}
+
+.profile-menu button:hover {
+  background-color: #f1f1f1;
+}
+
+/* Review Stars (for reviews.jsp) */
+.star {
+  font-size: 1.5rem;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.star:hover, .star.selected {
+  color: #D4AF37;
+}
+
+.comment-area {
+  width: 100%;
+  height: 100px;
   padding: 10px;
-  margin-bottom: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  resize: vertical;
+}
+
+.submit-btn {
+  background-color: #556673;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #3a4a5c;
+}
+
+/* Calendar and Time Slots (for book-appointment.jsp) */
+.day {
+  padding: 10px;
   text-align: center;
+  cursor: pointer;
+}
+
+.day.selected {
+  background-color: #556673;
+  color: white;
+  border-radius: 50%;
+}
+
+.time-slot {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
   cursor: pointer;
 }
 
 .time-slot.selected {
   background-color: #556673;
   color: white;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .image-container {
+    max-width: 100%;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  nav ul {
+    gap: 15px;
+  }
+
+  .hero {
+    padding: 40px 0;
+  }
+
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-image {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .search-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-input, .search-dropdown, .search-button {
+    width: 100%;
+  }
+
+  .attorney-card {
+    width: calc(50% - 10px);
+  }
+
+  .lawyer-card {
+    width: calc(50% - 20px);
+  }
+
+  .team-member {
+    width: calc(50% - 20px);
+  }
+
+  .testimonials {
+    flex-direction: column;
+  }
+
+  .footer-content {
+    flex-direction: column;
+  }
+}
+
+/* Additional Styles */
+.lawyer-card, .team-member, .attorney-card {
+  transition: transform 0.3s ease;
+}
+
+.lawyer-card:hover, .team-member:hover, .attorney-card:hover {
+  transform: scale(1.05);
 }
