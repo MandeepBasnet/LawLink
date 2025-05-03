@@ -6,162 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lawyers</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-        }
-
-        header {
-            background-color: #4d5b69;
-            padding: 15px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-
-        nav ul li {
-            margin-left: 30px;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .team-container {
-            max-width: 1200px;
-            margin: 30px auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            padding: 0 15px;
-        }
-
-        .team-member {
-            background-color: #ccc;
-            position: relative;
-            height: 400px;
-        }
-
-        .team-member img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .member-info {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            color: white;
-        }
-
-        .member-name {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .member-title {
-            font-size: 14px;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .member-contact {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        .member-contact p {
-            margin-bottom: 5px;
-        }
-
-        .member-bio {
-            margin-top: auto;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        @media (max-width: 992px) {
-            .team-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 15px;
-            }
-
-            nav ul {
-                margin-top: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            nav ul li {
-                margin: 5px 10px;
-            }
-
-            .team-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 </head>
 <body>
 <!-- Header Section -->
-<header>
-    <div class="logo-container">
-        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="LawLink Logo" class="logo-img">
-        <div class="logo-text">LawLink</div>
-    </div>
-    <nav>
-        <ul>
-            <li><a href="${pageContext.request.contextPath}/home">Home</a></li>
-            <li><a href="${pageContext.request.contextPath}/appointment">Appointment</a></li>
-            <li><a href="${pageContext.request.contextPath}/lawyers">lawyers</a></li>
-            <li><a href="${pageContext.request.contextPath}/about-us">About Us</a></li>
-            <li><a href="${pageContext.request.contextPath}/contact-us">Contact Us</a></li>
-            <li><a href="${pageContext.request.contextPath}/log-in">Log In</a></li>
-        </ul>
-    </nav>
-</header>
+<jsp:include page="includes/header.jsp" />
+
 
 <!-- Team Members Grid -->
 <div class="team-container">
@@ -261,5 +111,8 @@
         </div>
     </div>
 </div>
+
+<jsp:include page="includes/footer.jsp" />
+
 </body>
 </html>
