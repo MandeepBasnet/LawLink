@@ -90,7 +90,10 @@
       </div>
 
       <div class="appointment-actions">
-        <div class="btn btn-leave_review">Leave Review</div>
+        <form action="${pageContext.request.contextPath}/client/reviews" method="get">
+          <input type="hidden" name="appointmentId" value="3">
+          <button type="submit" class="btn btn-leave_review">Leave Review</button>
+        </form>
       </div>
 
       <div class="appointment-actions">
