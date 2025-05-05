@@ -2,12 +2,15 @@ package dao;
 
 import model.User;
 import util.DBConnectionUtil;
+import util.FileStorageUtil;
 import util.PasswordUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import jakarta.servlet.http.Part;
 
 /**
  * Data Access Object for User entity
@@ -26,11 +29,11 @@ public class UserDAO {
      * @return true if successful, false otherwise
      */
     public boolean createUser(User user) {
-        String sql = "INSERT INTO users (username, password, email, full_name, phone, address, role, is_active) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, email, full_name, phone, address, role, is_active, profile_image) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
+
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
@@ -38,9 +41,11 @@ public class UserDAO {
             pstmt.setString(5, user.getPhone());
             pstmt.setString(6, user.getAddress());
             pstmt.setString(7, user.getRole());
-            
+            pstmt.setBoolean(8, user.isActive());
+            pstmt.setString(9, user.getProfileImage());
+
             int affectedRows = pstmt.executeUpdate();
-            
+
             if (affectedRows > 0) {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -52,6 +57,48 @@ public class UserDAO {
             return false;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error creating user", e);
+            return false;
+        }
+    }
+
+    /**
+     * Register a new user with optional profile image
+     * @param user User object to register
+     * @param profilePicturePart The uploaded profile picture part
+     * @return true if successful, false otherwise
+     */
+    public boolean registerUser(User user, Part profilePicturePart) {
+        try {
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            user.setPassword(hashedPassword);
+            System.out.println("Hashed password for user: " + user.getUsername());
+            String tempProfileImagePath = null;
+            if (profilePicturePart != null && profilePicturePart.getSize() > 0) {
+                System.out.println("Profile picture provided, size: " + profilePicturePart.getSize() + " bytes");
+                tempProfileImagePath = FileStorageUtil.saveProfileImage(profilePicturePart, 0);
+                user.setProfileImage(tempProfileImagePath);
+                System.out.println("Temporary profile image saved: " + tempProfileImagePath);
+            } else {
+                System.out.println("No profile picture provided");
+            }
+            boolean success = createUser(user);
+            System.out.println("User creation success: " + success);
+            if (success && tempProfileImagePath != null) {
+                String finalProfileImagePath = FileStorageUtil.saveProfileImage(profilePicturePart, user.getUserId());
+                user.setProfileImage(finalProfileImagePath);
+                System.out.println("Final profile image saved: " + finalProfileImagePath);
+                updateUserProfile(user);
+                System.out.println("User profile updated with final image path");
+                FileStorageUtil.deleteProfileImage(tempProfileImagePath);
+                System.out.println("Temporary profile image deleted: " + tempProfileImagePath);
+            }
+            return success;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to register user: " + e.getMessage(), e);
+            if (user.getProfileImage() != null) {
+                FileStorageUtil.deleteProfileImage(user.getProfileImage());
+                System.out.println("Cleaned up temporary profile image: " + user.getProfileImage());
+            }
             return false;
         }
     }
@@ -91,7 +138,7 @@ public class UserDAO {
         String sql = "SELECT * FROM users WHERE username = ?";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -196,19 +243,20 @@ public class UserDAO {
      */
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE users SET username = ?, email = ?, full_name = ?, " +
-                    "phone = ?, address = ?, gender = ? WHERE user_id = ?";
-                    
+                "phone = ?, address = ?, gender = ?, profile_image = ? WHERE user_id = ?";
+
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getFullName());
             stmt.setString(4, user.getPhone());
             stmt.setString(5, user.getAddress());
             stmt.setString(6, user.getGender());
-            stmt.setInt(7, user.getUserId());
-            
+            stmt.setString(7, user.getProfileImage());
+            stmt.setInt(8, user.getUserId());
+
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -263,9 +311,6 @@ public class UserDAO {
         }
     }
 
-
-
-
     /**
      * Delete a user from the database
      * @param userId ID of the user to delete
@@ -287,7 +332,6 @@ public class UserDAO {
         }
     }
 
-
     /**
      * Map a ResultSet to a User object
      * @param rs ResultSet to map
@@ -304,27 +348,9 @@ public class UserDAO {
         user.setPhone(rs.getString("phone"));
         user.setAddress(rs.getString("address"));
         user.setRole(rs.getString("role"));
+        user.setProfileImage(rs.getString("profile_image"));
         return user;
     }
-
-    /**
-     * Register a new user
-     * @param user User object to register
-     * @return true if successful, false otherwise
-     */
-    public boolean registerUser(User user) {
-        try {
-            // Hash password using BCrypt
-            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
-            user.setPassword(hashedPassword);
-
-            return createUser(user);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to register user", e);
-            return false;
-        }
-    }
-
 
     /**
      * Update a user's profile
@@ -351,16 +377,14 @@ public class UserDAO {
         }
     }
 
-
-
     public List<User> getAllClients() throws SQLException {
         List<User> clients = new ArrayList<>();
         String sql = "SELECT * FROM users WHERE role = 'CLIENT'";
-        
+
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+
             while (rs.next()) {
                 User client = new User();
                 client.setUserId(rs.getInt("user_id"));
@@ -377,11 +401,9 @@ public class UserDAO {
             LOGGER.severe("Error retrieving all clients: " + e.getMessage());
             throw e;
         }
-        
+
         return clients;
     }
-
-
 
     public void close() {
         try {
