@@ -19,6 +19,9 @@
         <c:if test="${not empty error}">
             <div class="alert alert-danger">${error}</div>
         </c:if>
+        <c:if test="${not empty success}">
+            <div class="alert alert-success">${success}</div>
+        </c:if>
         <div class="appointment-layout">
             <!-- Left Column: Lawyer Profile, Appointment Form, Latest Reviews -->
             <div class="left-section">
@@ -35,7 +38,6 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <!-- Fallback Content -->
                             <img src="${pageContext.request.contextPath}/assets/images/zaina.png" alt="Zaina Rai's profile picture" class="lawyer-image" />
                             <div class="lawyer-info">
                                 <h2 class="lawyer-name">Zaina Rai</h2>
@@ -60,7 +62,7 @@
                         </div>
                         <div class="form-group">
                             <label for="clientPhone">Phone Number:</label>
-                            <input type="text" id="clientPhone" name="clientPhone" class="form-control" placeholder="Add your phone number" required />
+                            <input type="tel" id="clientPhone" name="clientPhone" class="form-control" placeholder="Add your phone number" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required />
                         </div>
                         <div class="form-group">
                             <label for="notes">Notes:</label>
@@ -73,7 +75,7 @@
                 <div class="reviews-section">
                     <h3 class="reviews-title">Latest reviews</h3>
                     <div class="reviews-container" id="reviewsContainer">
-                        <!-- Reviews will be populated via JavaScript -->
+                        <!-- Reviews populated via JavaScript -->
                     </div>
                 </div>
             </div>
@@ -104,18 +106,18 @@
                         <div class="days" id="calendarDays"></div>
                     </div>
 
-                    <button class="select-button" id="selectDateButton">select date</button>
+                    <button class="select-button" id="selectDateButton">Select Date</button>
                 </div>
 
                 <!-- Time Selection -->
                 <div class="time-selection">
                     <h3 class="calendar-title">Select appointment time:</h3>
                     <div class="time-slots" id="timeSlots"></div>
-                    <button class="select-button mt-4" id="selectTimeButton">select time</button>
+                    <button class="select-button mt-4" id="selectTimeButton">Select Time</button>
                 </div>
 
                 <!-- Book Appointment Button -->
-                <button class="select-button mt-4 book-appointment-btn">Book Appointment</button>
+                <button class="select-button mt-4 book-appointment-btn" id="bookAppointmentButton">Book Appointment</button>
             </div>
         </div>
     </div>
@@ -248,12 +250,10 @@
         // Fetch reviews dynamically
         function fetchReviews() {
             const lawyerId = ${lawyer.lawyerId != null ? lawyer.lawyerId : 0};
-            console.log('Fetching reviews for lawyerId:', lawyerId);
             const reviewsContainer = document.getElementById('reviewsContainer');
             reviewsContainer.innerHTML = '<p>Loading reviews...</p>';
 
             if (lawyerId <= 0) {
-                console.error('Invalid lawyerId:', lawyerId);
                 reviewsContainer.innerHTML = '<p>No reviews available.</p>';
                 return;
             }
@@ -265,16 +265,13 @@
                 }
             })
                 .then(response => {
-                    console.log('Reviews response status:', response.status);
                     if (!response.ok) {
                         throw new Error('Failed to fetch reviews: HTTP ' + response.status);
                     }
                     return response.json();
                 })
                 .then(reviews => {
-                    console.log('Received reviews:', reviews);
                     reviewsContainer.innerHTML = '';
-
                     if (Array.isArray(reviews) && reviews.length > 0) {
                         reviews.forEach(review => {
                             const stars = Array(5).fill(0).map((_, i) =>
@@ -301,7 +298,6 @@
                                 '</div>';
                         });
                     } else {
-                        console.log('No reviews found for lawyerId:', lawyerId);
                         reviewsContainer.innerHTML = '<p>No reviews available.</p>';
                     }
                 })
@@ -323,19 +319,31 @@
         });
 
         // Book Appointment button
-        document.querySelector('.book-appointment-btn').addEventListener('click', function() {
+        document.getElementById('bookAppointmentButton').addEventListener('click', function() {
             const form = document.getElementById('appointmentForm');
-            if (!document.getElementById('appointmentDate').value) {
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            const clientName = document.getElementById('clientName').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+
+            if (!appointmentDate) {
                 alert('Please select an appointment date.');
-            } else if (!document.getElementById('appointmentTime').value) {
-                alert('Please select an appointment time.');
-            } else if (!document.getElementById('clientName').value) {
-                alert('Please enter your name.');
-            } else if (!document.getElementById('clientPhone').value) {
-                alert('Please enter your phone number.');
-            } else {
-                form.submit();
+                return;
             }
+            if (!appointmentTime) {
+                alert('Please select an appointment time.');
+                return;
+            }
+            if (!clientName) {
+                alert('Please enter your name.');
+                return;
+            }
+            if (!clientPhone || !/^[0-9]{10}$/.test(clientPhone)) {
+                alert('Please enter a valid 10-digit phone number.');
+                return;
+            }
+
+            form.submit();
         });
     });
 </script>
@@ -359,6 +367,21 @@
     .time-slot.selected, .day.selected {
         background-color: var(--highlight-color);
         color: white;
+    }
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
     }
 </style>
 </body>

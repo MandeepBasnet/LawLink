@@ -109,7 +109,7 @@ public class UserDAO {
      * @return User object if found, null otherwise
      */
     public User getUserById(int userId) {
-        String sql = "SELECT * FROM Users WHERE user_id = ?";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id WHERE u.user_id = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -135,23 +135,14 @@ public class UserDAO {
      * @return User object if found, null otherwise
      */
     public User getUserByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id WHERE u.username = ?";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
-                    user.setUserId(rs.getInt("user_id"));
-                    user.setUsername(rs.getString("username"));
-                    user.setPassword(rs.getString("password"));
-                    user.setEmail(rs.getString("email"));
-                    user.setFullName(rs.getString("full_name"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setAddress(rs.getString("address"));
-                    user.setRole(rs.getString("role"));
-                    return user;
+                    return mapResultSetToUser(rs);
                 }
             }
         } catch (SQLException e) {
@@ -166,7 +157,7 @@ public class UserDAO {
      * @return User object if found, null otherwise
      */
     public User getUserByEmail(String email) {
-        String sql = "SELECT * FROM Users WHERE email = ?";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id WHERE u.email = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -192,7 +183,7 @@ public class UserDAO {
      * @return User object if found and token is valid, null otherwise
      */
     public User getUserBySessionToken(String sessionToken) {
-        String sql = "SELECT * FROM Users WHERE session_token = ? AND session_expiry > NOW()";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id WHERE u.session_token = ? AND u.session_expiry > NOW()";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -217,7 +208,7 @@ public class UserDAO {
      * @return List of User objects
      */
     public List<User> getAllUsers() {
-        String sql = "SELECT * FROM Users";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id";
         List<User> users = new ArrayList<>();
 
         try (Connection conn = DBConnectionUtil.getConnection();
@@ -258,6 +249,21 @@ public class UserDAO {
             stmt.setInt(8, user.getUserId());
 
             int rowsAffected = stmt.executeUpdate();
+
+            // Update date_of_birth in Clients table if user is a client
+            if ("CLIENT".equals(user.getRole()) && user.getDateOfBirth() != null) {
+                String clientSql = "INSERT INTO Clients (client_id, date_of_birth, gender) " +
+                        "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE date_of_birth = ?, gender = ?";
+                try (PreparedStatement clientStmt = conn.prepareStatement(clientSql)) {
+                    clientStmt.setInt(1, user.getUserId());
+                    clientStmt.setString(2, user.getDateOfBirth());
+                    clientStmt.setString(3, user.getGender());
+                    clientStmt.setString(4, user.getDateOfBirth());
+                    clientStmt.setString(5, user.getGender());
+                    clientStmt.executeUpdate();
+                }
+            }
+
             return rowsAffected > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating user: " + e.getMessage(), e);
@@ -349,6 +355,8 @@ public class UserDAO {
         user.setAddress(rs.getString("address"));
         user.setRole(rs.getString("role"));
         user.setProfileImage(rs.getString("profile_image"));
+        user.setGender(rs.getString("gender"));
+        user.setDateOfBirth(rs.getString("date_of_birth"));
         return user;
     }
 
@@ -369,6 +377,9 @@ public class UserDAO {
             existingUser.setPhone(user.getPhone());
             existingUser.setAddress(user.getAddress());
             existingUser.setProfileImage(user.getProfileImage());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setGender(user.getGender());
+            existingUser.setDateOfBirth(user.getDateOfBirth());
 
             return updateUser(existingUser);
         } catch (Exception e) {
@@ -379,7 +390,7 @@ public class UserDAO {
 
     public List<User> getAllClients() throws SQLException {
         List<User> clients = new ArrayList<>();
-        String sql = "SELECT * FROM users WHERE role = 'CLIENT'";
+        String sql = "SELECT u.*, c.date_of_birth FROM Users u LEFT JOIN Clients c ON u.user_id = c.client_id WHERE u.role = 'CLIENT'";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -395,6 +406,8 @@ public class UserDAO {
                 client.setPhone(rs.getString("phone"));
                 client.setAddress(rs.getString("address"));
                 client.setProfileImage(rs.getString("profile_image"));
+                client.setGender(rs.getString("gender"));
+                client.setDateOfBirth(rs.getString("date_of_birth"));
                 clients.add(client);
             }
         } catch (SQLException e) {
